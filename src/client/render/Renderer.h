@@ -1,286 +1,350 @@
 #pragma once
-#include "util/DXUtil.h"
-#include <vector>
 #include <shared_mutex>
+#include <vector>
+
+#include "util/DXUtil.h"
 
 class Renderer final {
-public:
-	Renderer() = default;
-	Renderer(Renderer&) = delete;
-	Renderer(Renderer&&) = delete;
-	~Renderer();
+  public:
+    Renderer() = default;
+    Renderer(Renderer&) = delete;
+    Renderer(Renderer&&) = delete;
+    ~Renderer();
 
-	bool init(IDXGISwapChain* chain);
-	bool hasInitialized() { return hasInit; };
-	HRESULT reinit();
-	void setShouldReinit();
-	void setShouldInit();
-	std::shared_lock<std::shared_mutex> lock();
-	void render();
-	bool isDX11ByDefault() { return isDX11; }
+    bool init(IDXGISwapChain* chain);
 
-	int64_t mcePerf;
-	int64_t arpPerf;
-	int64_t d2dPerf;
-	int64_t d3dPerf;
-private:
-	bool isDX11 = false;
+    bool hasInitialized() {
+        return hasInit;
+    };
 
-	std::wstring fontFamily = L"Segoe UI";
-	std::wstring fontFamily2 = L"Segoe UI";
-	void releaseAllResources(bool indep = true);
+    HRESULT reinit();
+    void setShouldReinit();
+    void setShouldInit();
+    std::shared_lock<std::shared_mutex> lock();
+    void render();
 
-	void createTextFormats();
-	void releaseTextFormats();
+    bool isDX11ByDefault() {
+        return isDX11;
+    }
 
-	bool hasInit = false;
-	bool shouldReinit = false;
-	bool firstInit = false;
-	bool shouldInit = false;
-	bool reqCommandQueue = false;
-	bool dx12Removed = false;
-	bool hasCopiedBitmap = false;
+    int64_t mcePerf;
+    int64_t arpPerf;
+    int64_t d2dPerf;
+    int64_t d3dPerf;
 
-	IDXGISwapChain* gameSwapChain;
-	IDXGISwapChain4* swapChain4;
+  private:
+    bool isDX11 = false;
 
-	ComPtr<IDXGIDevice> dxgiDevice;
+    std::wstring fontFamily = L"Segoe UI";
+    std::wstring fontFamily2 = L"Segoe UI";
+    void releaseAllResources(bool indep = true);
 
-	ComPtr<ID3D12Device> gameDevice12;
-	ComPtr<ID3D11Device> gameDevice11;
-	ID3D11Device* d3dDevice;
-	ID3D12CommandQueue* commandQueue;
+    void createTextFormats();
+    void releaseTextFormats();
 
-	ComPtr<ID3D11DeviceContext> d3dCtx;
-	ComPtr<ID3D11On12Device> d3d11On12Device;
+    bool hasInit = false;
+    bool shouldReinit = false;
+    bool firstInit = false;
+    bool shouldInit = false;
+    bool reqCommandQueue = false;
+    bool dx12Removed = false;
+    bool hasCopiedBitmap = false;
 
-	ComPtr<ID2D1Factory3> d2dFactory;
-	ComPtr<ID2D1Device> d2dDevice;
-	ComPtr<ID2D1DeviceContext> d2dCtx;
-	ComPtr<IDWriteFactory> dWriteFactory;
-	ComPtr<IWICImagingFactory2> wicFactory;
+    IDXGISwapChain* gameSwapChain;
+    IDXGISwapChain4* swapChain4;
 
-	ComPtr<ID2D1SolidColorBrush> solidBrush;
-	ComPtr<ID2D1Effect> shadowEffect;
-	ComPtr<ID2D1Effect> affineTransformEffect;
-	ComPtr<ID2D1Effect> blurEffect;
+    ComPtr<IDXGIDevice> dxgiDevice;
 
-	ComPtr<IDWriteTextFormat> primaryFont;
-	ComPtr<IDWriteTextFormat> primarySemilight;
-	ComPtr<IDWriteTextFormat> primaryLight;
-	ComPtr<IDWriteTextFormat> secondaryFont;
-	ComPtr<IDWriteTextFormat> secondarySemilight;
-	ComPtr<IDWriteTextFormat> secondaryLight;
+    ComPtr<ID3D12Device> gameDevice12;
+    ComPtr<ID3D11Device> gameDevice11;
+    ID3D11Device* d3dDevice;
+    ID3D12CommandQueue* commandQueue;
 
-	std::vector<ID3D12Resource*> d3d12Targets = {  };
-	std::vector<ID3D11Resource*> d3d11Targets = {};
-	std::vector<ID2D1Bitmap1*> renderTargets = {};
+    ComPtr<ID3D11DeviceContext> d3dCtx;
+    ComPtr<ID3D11On12Device> d3d11On12Device;
 
-	std::vector<ID2D1Bitmap1*> blurBuffers = {};
+    ComPtr<ID2D1Factory3> d2dFactory;
+    ComPtr<ID2D1Device> d2dDevice;
+    ComPtr<ID2D1DeviceContext> d2dCtx;
+    ComPtr<IDWriteFactory> dWriteFactory;
+    ComPtr<IWICImagingFactory2> wicFactory;
 
-	std::unordered_map<int64_t, std::pair<IDWriteTextFormat*, ComPtr<IDWriteTextLayout>>> cachedLayouts;
+    ComPtr<ID2D1SolidColorBrush> solidBrush;
+    ComPtr<ID2D1Effect> shadowEffect;
+    ComPtr<ID2D1Effect> affineTransformEffect;
+    ComPtr<ID2D1Effect> blurEffect;
 
-	std::shared_mutex mutex;
-	int bufferCount = 3;
-	float deltaTime = 1.f;
-	std::chrono::system_clock::time_point lastTime;
-public:
-	ID2D1Bitmap1* testBitmap;
+    ComPtr<IDWriteTextFormat> primaryFont;
+    ComPtr<IDWriteTextFormat> primarySemilight;
+    ComPtr<IDWriteTextFormat> primaryLight;
+    ComPtr<IDWriteTextFormat> secondaryFont;
+    ComPtr<IDWriteTextFormat> secondarySemilight;
+    ComPtr<IDWriteTextFormat> secondaryLight;
 
-	enum class FontSelection {
-		PrimaryRegular,
-		PrimarySemilight,
-		PrimaryLight,
-		SecondaryRegular,
-		SecondarySemilight,
-		SecondaryLight,
-	};
+    std::vector<ID3D12Resource*> d3d12Targets = {};
+    std::vector<ID3D11Resource*> d3d11Targets = {};
+    std::vector<ID2D1Bitmap1*> renderTargets = {};
 
-	void createDeviceIndependentResources();
-	void createDeviceDependentResources();
+    std::vector<ID2D1Bitmap1*> blurBuffers = {};
 
-	void releaseDeviceIndependentResources();
-	void releaseDeviceResources();
+    std::unordered_map<
+        int64_t,
+        std::pair<IDWriteTextFormat*, ComPtr<IDWriteTextLayout>>>
+        cachedLayouts;
 
-	void updateSecondaryFont(std::wstring family) {
-		fontFamily2 = std::move(family);
+    std::shared_mutex mutex;
+    int bufferCount = 3;
+    float deltaTime = 1.f;
+    std::chrono::system_clock::time_point lastTime;
 
-		auto mutex = lock();
-		releaseTextFormats();
-		createTextFormats();
-	}
+  public:
+    ID2D1Bitmap1* testBitmap;
 
-	void setDevice11(ID3D11Device* dev) {
-		gameDevice11 = dev;
-	}
+    enum class FontSelection {
+        PrimaryRegular,
+        PrimarySemilight,
+        PrimaryLight,
+        SecondaryRegular,
+        SecondarySemilight,
+        SecondaryLight,
+    };
 
-	void setDevice12(ID3D12Device* dev) {
-		gameDevice12 = dev;
-	}
+    void createDeviceIndependentResources();
+    void createDeviceDependentResources();
 
-	void setCommandQueue(ID3D12CommandQueue* queue) noexcept {
-		commandQueue = queue;
-	}
+    void releaseDeviceIndependentResources();
+    void releaseDeviceResources();
 
-	void setSwapChain(IDXGISwapChain* chain) noexcept {
-		gameSwapChain = chain;
-	}
+    void updateSecondaryFont(std::wstring family) {
+        fontFamily2 = std::move(family);
 
-	void clearTextCache() {
-		this->cachedLayouts.clear();
-	}
+        auto mutex = lock();
+        releaseTextFormats();
+        createTextFormats();
+    }
 
-	[[nodiscard]] std::wstring getFontFamily() {
-		return this->fontFamily;
-	}
+    void setDevice11(ID3D11Device* dev) {
+        gameDevice11 = dev;
+    }
 
-	void setFontFamily(std::wstring ws) {
-		this->fontFamily = ws;
-	}
+    void setDevice12(ID3D12Device* dev) {
+        gameDevice12 = dev;
+    }
 
-	[[nodiscard]] std::wstring getFontFamily2() {
-		return this->fontFamily2;
-	}
+    void setCommandQueue(ID3D12CommandQueue* queue) noexcept {
+        commandQueue = queue;
+    }
 
-	void setFontFamily2(std::wstring const& f2) {
-		fontFamily2 = f2;
-	}
+    void setSwapChain(IDXGISwapChain* chain) noexcept {
+        gameSwapChain = chain;
+    }
 
-	[[nodiscard]] D2D1_SIZE_F getScreenSize() {
-		return { (float)d2dCtx->GetPixelSize().width, (float)d2dCtx->GetPixelSize().height };
-	}
+    void clearTextCache() {
+        this->cachedLayouts.clear();
+    }
 
-	[[nodiscard]] float getDeltaTime() {
-		return deltaTime;
-	}
+    [[nodiscard]]
+    std::wstring getFontFamily() {
+        return this->fontFamily;
+    }
 
-	[[nodiscard]] IDWriteTextFormat* getTextFormat(FontSelection selection) {
-		switch (selection) {
-		case FontSelection::PrimaryRegular:
-			return primaryFont.Get();
-		case FontSelection::PrimarySemilight:
-			return primarySemilight.Get();
-		case FontSelection::PrimaryLight:
-			return primaryLight.Get();
-		case FontSelection::SecondaryRegular:
-			return secondaryFont.Get();
-		case FontSelection::SecondarySemilight:
-			return secondarySemilight.Get();
-		case FontSelection::SecondaryLight:
-			return secondaryLight.Get();
-		default:
-			return nullptr;
-		}
-	}
+    void setFontFamily(std::wstring ws) {
+        this->fontFamily = ws;
+    }
 
-	[[nodiscard]] ID2D1DeviceContext* getDeviceContext() {
-		return d2dCtx.Get();
-	}
+    [[nodiscard]]
+    std::wstring getFontFamily2() {
+        return this->fontFamily2;
+    }
 
-	[[nodiscard]] ID2D1Device* getDevice() {
-		return d2dDevice.Get();
-	}
+    void setFontFamily2(std::wstring const& f2) {
+        fontFamily2 = f2;
+    }
 
-	[[nodiscard]] ID2D1SolidColorBrush* getSolidBrush() {
-		return solidBrush.Get();
-	}
+    [[nodiscard]]
+    D2D1_SIZE_F getScreenSize() {
+        return {
+            (float)d2dCtx->GetPixelSize().width,
+            (float)d2dCtx->GetPixelSize().height
+        };
+    }
 
-	[[nodiscard]] ID2D1Factory3* getFactory() {
-		return d2dFactory.Get();
-	}
+    [[nodiscard]]
+    float getDeltaTime() {
+        return deltaTime;
+    }
 
-	[[nodiscard]] IDWriteFactory* getDWriteFactory() {
-		return dWriteFactory.Get();
-	}
+    [[nodiscard]]
+    IDWriteTextFormat* getTextFormat(FontSelection selection) {
+        switch (selection) {
+            case FontSelection::PrimaryRegular:
+                return primaryFont.Get();
+            case FontSelection::PrimarySemilight:
+                return primarySemilight.Get();
+            case FontSelection::PrimaryLight:
+                return primaryLight.Get();
+            case FontSelection::SecondaryRegular:
+                return secondaryFont.Get();
+            case FontSelection::SecondarySemilight:
+                return secondarySemilight.Get();
+            case FontSelection::SecondaryLight:
+                return secondaryLight.Get();
+            default:
+                return nullptr;
+        }
+    }
 
-	[[nodiscard]] ID2D1Bitmap1* getCopiedBitmap() {
-		auto idx = swapChain4->GetCurrentBackBufferIndex();
-		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
-		ID2D1Bitmap1* newBitmap = blurBuffers[0];
+    [[nodiscard]]
+    ID2D1DeviceContext* getDeviceContext() {
+        return d2dCtx.Get();
+    }
 
-		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
-		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
-		if (!hasCopiedBitmap) {
-			newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
-			hasCopiedBitmap = true;
-		}
-		return newBitmap;
-	}
+    [[nodiscard]]
+    ID2D1Device* getDevice() {
+        return d2dDevice.Get();
+    }
 
-	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap() {
-		auto idx = swapChain4->GetCurrentBackBufferIndex();
-		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
-		ID2D1Bitmap1* newBitmap;
+    [[nodiscard]]
+    ID2D1SolidColorBrush* getSolidBrush() {
+        return solidBrush.Get();
+    }
 
-		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
-		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+    [[nodiscard]]
+    ID2D1Factory3* getFactory() {
+        return d2dFactory.Get();
+    }
 
-		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), &newBitmap);
-		if (SUCCEEDED(hr)) {
-			newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
-		}
-		return newBitmap;
-	}
+    [[nodiscard]]
+    IDWriteFactory* getDWriteFactory() {
+        return dWriteFactory.Get();
+    }
 
-	[[nodiscard]] ID2D1Bitmap1* getCopiedBitmap(d2d::Rect const& rc) {
-		auto idx = swapChain4->GetCurrentBackBufferIndex();
-		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
-		ID2D1Bitmap1* newBitmap;
+    [[nodiscard]]
+    ID2D1Bitmap1* getCopiedBitmap() {
+        auto idx = swapChain4->GetCurrentBackBufferIndex();
+        ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+        ID2D1Bitmap1* newBitmap = blurBuffers[0];
 
-		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
-		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+        D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+        D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+        if (!hasCopiedBitmap) {
+            newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
+            hasCopiedBitmap = true;
+        }
+        return newBitmap;
+    }
 
-		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), &newBitmap);
-		if (SUCCEEDED(hr)) {
-			auto pt = D2D1::Point2U((UINT32)rc.left, (UINT32)rc.top);
-			auto urc = D2D1::RectU((UINT32)rc.left, (UINT32)rc.top, (UINT32)rc.right, (UINT32)rc.bottom);
-			newBitmap->CopyFromBitmap(&pt, myBitmap, &urc);
-		}
-		return newBitmap;
-	}
+    [[nodiscard]]
+    ID2D1Bitmap1* copyCurrentBitmap() {
+        auto idx = swapChain4->GetCurrentBackBufferIndex();
+        ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+        ID2D1Bitmap1* newBitmap;
 
-	[[nodiscard]] void getCopiedBitmap(ID2D1Bitmap1*& bmp, d2d::Rect const& rc) {
-		auto idx = swapChain4->GetCurrentBackBufferIndex();
-		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+        D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+        D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
 
-		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
-		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+        HRESULT hr = d2dCtx->CreateBitmap(
+            bitmapSize,
+            nullptr,
+            0,
+            D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat),
+            &newBitmap
+        );
+        if (SUCCEEDED(hr)) {
+            newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
+        }
+        return newBitmap;
+    }
 
-		auto pt = D2D1::Point2U((UINT32)rc.left, (UINT32)rc.top);
-		auto urc = D2D1::RectU((UINT32)rc.left, (UINT32)rc.top, (UINT32)rc.right, (UINT32)rc.bottom);
-		bmp->CopyFromBitmap(&pt, myBitmap, &urc);
-	}
+    [[nodiscard]]
+    ID2D1Bitmap1* getCopiedBitmap(d2d::Rect const& rc) {
+        auto idx = swapChain4->GetCurrentBackBufferIndex();
+        ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+        ID2D1Bitmap1* newBitmap;
 
-	[[nodiscard]] void getCopiedBitmap(ID2D1Bitmap1*& bmp) {
-		auto idx = swapChain4->GetCurrentBackBufferIndex();
-		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
-		bmp->CopyFromBitmap(nullptr, myBitmap, nullptr);
-	}
+        D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+        D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
 
-	[[nodiscard]] ID2D1Effect*& getShadowEffect() {
-		return *shadowEffect.GetAddressOf();
-	}
+        HRESULT hr = d2dCtx->CreateBitmap(
+            bitmapSize,
+            nullptr,
+            0,
+            D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat),
+            &newBitmap
+        );
+        if (SUCCEEDED(hr)) {
+            auto pt = D2D1::Point2U((UINT32)rc.left, (UINT32)rc.top);
+            auto urc = D2D1::RectU(
+                (UINT32)rc.left,
+                (UINT32)rc.top,
+                (UINT32)rc.right,
+                (UINT32)rc.bottom
+            );
+            newBitmap->CopyFromBitmap(&pt, myBitmap, &urc);
+        }
+        return newBitmap;
+    }
 
-	[[nodiscard]] ID2D1Effect*& getAffineTransformEffect() {
-		return *affineTransformEffect.GetAddressOf();
-	}
+    [[nodiscard]]
+    void getCopiedBitmap(ID2D1Bitmap1*& bmp, d2d::Rect const& rc) {
+        auto idx = swapChain4->GetCurrentBackBufferIndex();
+        ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
 
-	[[nodiscard]] ID2D1Effect*& getBlurEffect() {
-		return *blurEffect.GetAddressOf();
-	}
+        D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+        D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
 
-	[[nodiscard]] ID2D1Bitmap1* getBitmap() {
-		auto buf = swapChain4->GetCurrentBackBufferIndex();
-		return this->renderTargets[buf];
-	}
+        auto pt = D2D1::Point2U((UINT32)rc.left, (UINT32)rc.top);
+        auto urc = D2D1::RectU(
+            (UINT32)rc.left,
+            (UINT32)rc.top,
+            (UINT32)rc.right,
+            (UINT32)rc.bottom
+        );
+        bmp->CopyFromBitmap(&pt, myBitmap, &urc);
+    }
 
-	[[nodiscard]] ID2D1Bitmap1* getBlurBitmap() {
-		return getCopiedBitmap();
-	}
+    [[nodiscard]]
+    void getCopiedBitmap(ID2D1Bitmap1*& bmp) {
+        auto idx = swapChain4->GetCurrentBackBufferIndex();
+        ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+        bmp->CopyFromBitmap(nullptr, myBitmap, nullptr);
+    }
 
-	[[nodiscard]] IWICImagingFactory2* getImagingFactory() {
-		return this->wicFactory.Get();
-	}
+    [[nodiscard]]
+    ID2D1Effect*& getShadowEffect() {
+        return *shadowEffect.GetAddressOf();
+    }
 
-	[[nodiscard]] IDWriteTextLayout* getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache = false);
+    [[nodiscard]]
+    ID2D1Effect*& getAffineTransformEffect() {
+        return *affineTransformEffect.GetAddressOf();
+    }
+
+    [[nodiscard]]
+    ID2D1Effect*& getBlurEffect() {
+        return *blurEffect.GetAddressOf();
+    }
+
+    [[nodiscard]]
+    ID2D1Bitmap1* getBitmap() {
+        auto buf = swapChain4->GetCurrentBackBufferIndex();
+        return this->renderTargets[buf];
+    }
+
+    [[nodiscard]]
+    ID2D1Bitmap1* getBlurBitmap() {
+        return getCopiedBitmap();
+    }
+
+    [[nodiscard]]
+    IWICImagingFactory2* getImagingFactory() {
+        return this->wicFactory.Get();
+    }
+
+    [[nodiscard]]
+    IDWriteTextLayout* getLayout(
+        IDWriteTextFormat* fmt,
+        std::wstring const& str,
+        bool cache = false
+    );
 };

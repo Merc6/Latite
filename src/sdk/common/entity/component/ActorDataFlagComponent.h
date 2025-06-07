@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 namespace SDK {
-    struct ActorDataFlagComponent {
-        std::bitset<119> flags;
-    };
-}
+struct ActorDataFlagComponent {
+    std::bitset<119> flags;
+};
+} // namespace SDK

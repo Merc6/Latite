@@ -1,5 +1,6 @@
-#include "pch.h"
 #include "ClientInstance.h"
+
+#include "pch.h"
 #include "util/Util.h"
 
 SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
@@ -9,19 +10,24 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
         if (Signatures::Misc::clientInstance.result) {
             static auto sig = Signatures::Misc::clientInstance.result;
             uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
-            if (!evalPtr) return nullptr;
+            if (!evalPtr)
+                return nullptr;
             evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr);
 
             int offs = 0x58;
-            if (SDK::internalVers == SDK::V1_19_51) offs = 0x48;
+            if (SDK::internalVers == SDK::V1_19_51)
+                offs = 0x48;
 
             evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr + offs);
-            if (SDK::internalVers > SDK::V1_19_51) instance = *reinterpret_cast<ClientInstance**>(evalPtr);
-            else instance = reinterpret_cast<ClientInstance*>(evalPtr);
-        }
-        else {
+            if (SDK::internalVers > SDK::V1_19_51)
+                instance = *reinterpret_cast<ClientInstance**>(evalPtr);
+            else
+                instance = reinterpret_cast<ClientInstance*>(evalPtr);
+        } else {
             // IMinecraftGame
-            MinecraftGame** mcgame = reinterpret_cast<MinecraftGame**>(Signatures::Misc::minecraftGamePointer.result);
+            MinecraftGame** mcgame = reinterpret_cast<MinecraftGame**>(
+                Signatures::Misc::minecraftGamePointer.result
+            );
             if (!*mcgame) {
                 return nullptr;
             }
@@ -33,7 +39,8 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
 }
 
 SDK::BlockSource* SDK::ClientInstance::getRegion() {
-    if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
+    if (SDK::internalVers == SDK::V1_18_12
+        || SDK::internalVers == SDK::V1_19_51) {
         return memory::callVirtual<BlockSource*>(this, 0x17);
     }
     if (SDK::internalVers < SDK::V1_20_50) {
@@ -48,9 +55,9 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
     return memory::callVirtual<BlockSource*>(this, 0x1F);
 }
 
-
 SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
-    if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
+    if (SDK::internalVers == SDK::V1_18_12
+        || SDK::internalVers == SDK::V1_19_51) {
         return memory::callVirtual<LocalPlayer*>(this, 0x18);
     }
     if (SDK::internalVers < SDK::V1_20_50) {
@@ -67,25 +74,24 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
 
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
     switch (internalVers) {
-    case V1_18_12:
-        return memory::callVirtual<GuiData*>(this, 0xCE);
-    case V1_19_51:
-        return util::directAccess<GuiData*>(this, 0x500);
-    default:
-        if(internalVers < V1_21_30)
-        {
-            return util::directAccess<GuiData*>(this, 0x558);
-        }
-        if (internalVers >= V1_21_80) {
-            return util::directAccess<GuiData*>(this, 0x5B8);
-        }
-        if (internalVers >= V1_21_70) {
-            return util::directAccess<GuiData*>(this, 0x5B0);
-        }
-        if (internalVers >= V1_21_40) {
-            return util::directAccess<GuiData*>(this, 0x590);
-        }
-        return util::directAccess<GuiData*>(this, 0x588);
+        case V1_18_12:
+            return memory::callVirtual<GuiData*>(this, 0xCE);
+        case V1_19_51:
+            return util::directAccess<GuiData*>(this, 0x500);
+        default:
+            if (internalVers < V1_21_30) {
+                return util::directAccess<GuiData*>(this, 0x558);
+            }
+            if (internalVers >= V1_21_80) {
+                return util::directAccess<GuiData*>(this, 0x5B8);
+            }
+            if (internalVers >= V1_21_70) {
+                return util::directAccess<GuiData*>(this, 0x5B0);
+            }
+            if (internalVers >= V1_21_40) {
+                return util::directAccess<GuiData*>(this, 0x590);
+            }
+            return util::directAccess<GuiData*>(this, 0x588);
     }
     return nullptr;
 }
@@ -100,7 +106,8 @@ void SDK::ClientInstance::grabCursor() {
         memory::callVirtual<void>(this, 0x116);
         return;
     }
-    reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_grabCursor.result)(this);
+    reinterpret_cast<void(__fastcall*)(void*
+    )>(Signatures::ClientInstance_grabCursor.result)(this);
 }
 
 //vtable call:
@@ -111,5 +118,6 @@ void SDK::ClientInstance::releaseCursor() {
         memory::callVirtual<void>(this, 0x117);
         return;
     }
-    reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_releaseCursor.result)(this);
+    reinterpret_cast<void(__fastcall*)(void*
+    )>(Signatures::ClientInstance_releaseCursor.result)(this);
 }

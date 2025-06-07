@@ -2,8 +2,8 @@
 #include "ItemStackBase.h"
 
 namespace SDK {
-	class ItemStack : public ItemStackBase {
-	private:
-		uintptr_t netIds;
-	};
-}
+class ItemStack: public ItemStackBase {
+  private:
+    uintptr_t netIds;
+};
+} // namespace SDK

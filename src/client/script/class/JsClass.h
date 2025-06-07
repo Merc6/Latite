@@ -2,64 +2,84 @@
 #include "util/ChakraUtil.h"
 
 class JsClass {
-public:
-	JsClass(class JsScript* owner, const wchar_t* name): owner(owner), name(name) {
-	}
-	JsClass(JsClass&) = delete;
-	JsClass(JsClass&&) = delete;
+  public:
+    JsClass(class JsScript* owner, const wchar_t* name) :
+        owner(owner),
+        name(name) {}
 
-	virtual ~JsClass() {
+    JsClass(JsClass&) = delete;
+    JsClass(JsClass&&) = delete;
 
-		// this crash, probably becuase the runtime doesnt exist
-		//if (prototype != JS_INVALID_REFERENCE) JS::JsRelease(prototype, nullptr);
-		//if (constructor != JS_INVALID_REFERENCE) JS::JsRelease(constructor, nullptr);
-	}
-	
-	virtual void prepareFunctions() {};
+    virtual ~JsClass() {
+        // this crash, probably becuase the runtime doesnt exist
+        //if (prototype != JS_INVALID_REFERENCE) JS::JsRelease(prototype, nullptr);
+        //if (constructor != JS_INVALID_REFERENCE) JS::JsRelease(constructor, nullptr);
+    }
 
-	void createConstructor(JsNativeFunction callback, void* callbackState = nullptr) {
-		this->constructor = callback;
-		JS::JsCreateFunction(callback, callbackState, &constructor);
-		JS::JsAddRef(constructor, nullptr);
-	}
+    virtual void prepareFunctions() {};
 
-	JsValueRef errConstructCall() {
-		Chakra::ThrowError(name + std::wstring(L" cannot be invoked without 'new'"));
-		return JS_INVALID_REFERENCE;
-	}
+    void createConstructor(
+        JsNativeFunction callback,
+        void* callbackState = nullptr
+    ) {
+        this->constructor = callback;
+        JS::JsCreateFunction(callback, callbackState, &constructor);
+        JS::JsAddRef(constructor, nullptr);
+    }
 
-	JsValueRef errNoConstruct() {
-		Chakra::ThrowError(name + std::wstring(L" cannot be constructed"));
-		return JS_INVALID_REFERENCE;
-	}
+    JsValueRef errConstructCall() {
+        Chakra::ThrowError(
+            name + std::wstring(L" cannot be invoked without 'new'")
+        );
+        return JS_INVALID_REFERENCE;
+    }
 
-	void createPrototype() {
-		JsValueRef global;
+    JsValueRef errNoConstruct() {
+        Chakra::ThrowError(name + std::wstring(L" cannot be constructed"));
+        return JS_INVALID_REFERENCE;
+    }
 
-		JS::JsCreateObject(&prototype);
-		JS::JsAddRef(prototype, nullptr);
+    void createPrototype() {
+        JsValueRef global;
 
-		JS::JsGetGlobalObject(&global);
-		JsPropertyIdRef propId;
-		JS::JsGetPropertyIdFromName(name, &propId);
+        JS::JsCreateObject(&prototype);
+        JS::JsAddRef(prototype, nullptr);
 
-		JsValueRef classRef;
-		JS::JsGetProperty(global, propId, &classRef);
+        JS::JsGetGlobalObject(&global);
+        JsPropertyIdRef propId;
+        JS::JsGetPropertyIdFromName(name, &propId);
 
-		JS::JsGetPropertyIdFromName(L"prototype", &propId);
-		JS::JsSetProperty(classRef, propId, prototype, true);
+        JsValueRef classRef;
+        JS::JsGetProperty(global, propId, &classRef);
 
-		JS::JsRelease(global, nullptr);
-		JS::JsRelease(classRef, nullptr);
-	}
-	[[nodiscard]] JsValueRef getPrototype() { return prototype; }
-	[[nodiscard]] JsValueRef getConstructor() { return constructor; }
-	[[nodiscard]] const wchar_t* getName() { return name; }
-protected:
-	class JsScript* owner;
-	const wchar_t* name;
-	JsNativeFunction constructorCallback = nullptr;
-	JsValueRef constructor = JS_INVALID_REFERENCE;
-	JsValueRef prototype = JS_INVALID_REFERENCE;
-public:
+        JS::JsGetPropertyIdFromName(L"prototype", &propId);
+        JS::JsSetProperty(classRef, propId, prototype, true);
+
+        JS::JsRelease(global, nullptr);
+        JS::JsRelease(classRef, nullptr);
+    }
+
+    [[nodiscard]]
+    JsValueRef getPrototype() {
+        return prototype;
+    }
+
+    [[nodiscard]]
+    JsValueRef getConstructor() {
+        return constructor;
+    }
+
+    [[nodiscard]]
+    const wchar_t* getName() {
+        return name;
+    }
+
+  protected:
+    class JsScript* owner;
+    const wchar_t* name;
+    JsNativeFunction constructorCallback = nullptr;
+    JsValueRef constructor = JS_INVALID_REFERENCE;
+    JsValueRef prototype = JS_INVALID_REFERENCE;
+
+  public:
 };

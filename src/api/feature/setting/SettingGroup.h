@@ -1,38 +1,44 @@
 #pragma once
-#include <vector>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <vector>
 
 #include "Setting.h"
 
 // A group of settings.
-class SettingGroup : public std::enable_shared_from_this<SettingGroup> {
-public:
-	explicit SettingGroup(std::string const& name) : groupName(name) {}
-	~SettingGroup() = default;
+class SettingGroup: public std::enable_shared_from_this<SettingGroup> {
+  public:
+    explicit SettingGroup(std::string const& name) : groupName(name) {}
 
-	void forEach(std::function<void(std::shared_ptr<Setting> set)> callback) {
-		for (auto& setting : settings) {
-			callback(setting);
-		}
-	}
+    ~SettingGroup() = default;
 
-	[[nodiscard]] size_t size() {
-		return settings.size();
-	}
+    void forEach(std::function<void(std::shared_ptr<Setting> set)> callback) {
+        for (auto& setting : settings) {
+            callback(setting);
+        }
+    }
 
-	inline void addSetting(std::shared_ptr<Setting> set) {
-		settings.push_back(set);
-	}
+    [[nodiscard]]
+    size_t size() {
+        return settings.size();
+    }
 
-	[[nodiscard]] std::string name() { return groupName; }
+    inline void addSetting(std::shared_ptr<Setting> set) {
+        settings.push_back(set);
+    }
 
-	// TODO: Is this needed?
-	[[nodiscard]] std::shared_ptr<SettingGroup> getShared() {
-		return shared_from_this();
-	}
+    [[nodiscard]]
+    std::string name() {
+        return groupName;
+    }
 
-protected:
-	std::string groupName;
-	std::vector<std::shared_ptr<Setting>> settings;
+    // TODO: Is this needed?
+    [[nodiscard]]
+    std::shared_ptr<SettingGroup> getShared() {
+        return shared_from_this();
+    }
+
+  protected:
+    std::string groupName;
+    std::vector<std::shared_ptr<Setting>> settings;
 };

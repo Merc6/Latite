@@ -3,48 +3,48 @@
 #include <string>
 
 namespace SDK {
-    class ResourceLocation {
-    public:
-        alignas(8) int type;
-        std::string txt;
+class ResourceLocation {
+  public:
+    alignas(8) int type;
+    std::string txt;
 
-        ResourceLocation(std::string const& text, int type) {
-            txt = text;
-            this->type = type;
-        }
+    ResourceLocation(std::string const& text, int type) {
+        txt = text;
+        this->type = type;
+    }
 
-        ~ResourceLocation() = default;
-    private:
-        uint64_t mPathHash = 0;
-        uint64_t mFullHash = 0;
-    };
+    ~ResourceLocation() = default;
 
-    class BedrockTextureData {
-    private:
-        void* vtable; // I don't think these are owned, so won't free them off the memory
-        //void* idk2;
+  private:
+    uint64_t mPathHash = 0;
+    uint64_t mFullHash = 0;
+};
 
-    public:
-        //std::shared_ptr<ResourceLocation> resource;
+class BedrockTextureData {
+  private:
+    void*
+        vtable; // I don't think these are owned, so won't free them off the memory
+    //void* idk2;
 
-    private:
-        void* empty[10];
+  public:
+    //std::shared_ptr<ResourceLocation> resource;
 
-        ~BedrockTextureData() {
-        }
-    };
+  private:
+    void* empty[10];
 
-    class TexturePtr {
-    public:
-        std::shared_ptr<BedrockTextureData> textureData;
-        std::shared_ptr<ResourceLocation> resourceLocation;
+    ~BedrockTextureData() {}
+};
 
-        void clearTexture() {
-            resourceLocation.reset();
-            textureData.reset();
-        }
+class TexturePtr {
+  public:
+    std::shared_ptr<BedrockTextureData> textureData;
+    std::shared_ptr<ResourceLocation> resourceLocation;
 
-        ~TexturePtr() {
-        }
-    };
-}
+    void clearTexture() {
+        resourceLocation.reset();
+        textureData.reset();
+    }
+
+    ~TexturePtr() {}
+};
+} // namespace SDK

@@ -2,16 +2,22 @@
 #include "api/eventing/Event.h"
 #include "util/FNV32.h"
 
-class CinematicCameraEvent : public Event {
-public:
-	static const uint32_t hash = TOHASH(CinematicCameraEvent);
+class CinematicCameraEvent: public Event {
+  public:
+    static const uint32_t hash = TOHASH(CinematicCameraEvent);
 
-	[[nodiscard]] void setValue(bool b) { this->b = b; }
-	[[nodiscard]] bool getValue() { return b; }
+    [[nodiscard]]
+    void setValue(bool b) {
+        this->b = b;
+    }
 
-	CinematicCameraEvent(bool b) : b(b) {
-	}
+    [[nodiscard]]
+    bool getValue() {
+        return b;
+    }
 
-protected:
-	bool b;
+    CinematicCameraEvent(bool b) : b(b) {}
+
+  protected:
+    bool b;
 };

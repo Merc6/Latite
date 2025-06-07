@@ -1,30 +1,36 @@
 #pragma once
-#include "client/script/feature/JsEvented.h"
-#include "client/script/JsScript.h"
 #include <client/feature/module/TextModule.h>
 
-class JsTextModule : public TextModule, public JsEvented {
-public:
-	JsTextModule(std::string const& name, std::wstring const& displayName,
-		std::wstring const& desc, int key);
+#include "client/script/JsScript.h"
+#include "client/script/feature/JsEvented.h"
 
-	~JsTextModule() {
-		// FIXME: check if no leak
-		//JS::JsRelease(object, nullptr);
-	}
+class JsTextModule: public TextModule, public JsEvented {
+  public:
+    JsTextModule(
+        std::string const& name,
+        std::wstring const& displayName,
+        std::wstring const& desc,
+        int key
+    );
 
-	void onEnable() override;
-	void onDisable() override;
-	bool shouldHoldToToggle() override;
-	std::wstringstream text(bool isPreview, bool isEditor) override;
-	void preRender(bool mcRend, bool isPreview, bool isEditor) override;
+    ~JsTextModule() {
+        // FIXME: check if no leak
+        //JS::JsRelease(object, nullptr);
+    }
 
-	JsScript* script = nullptr;
-private:
-	std::string displayName;
-	std::wstring cachedText = L"";
-	bool cachedHoldToToggle = false;
+    void onEnable() override;
+    void onDisable() override;
+    bool shouldHoldToToggle() override;
+    std::wstringstream text(bool isPreview, bool isEditor) override;
+    void preRender(bool mcRend, bool isPreview, bool isEditor) override;
 
-	JsValueRef object = JS_INVALID_REFERENCE;
-	JsContextRef ctx = JS_INVALID_REFERENCE;
+    JsScript* script = nullptr;
+
+  private:
+    std::string displayName;
+    std::wstring cachedText = L"";
+    bool cachedHoldToToggle = false;
+
+    JsValueRef object = JS_INVALID_REFERENCE;
+    JsContextRef ctx = JS_INVALID_REFERENCE;
 };

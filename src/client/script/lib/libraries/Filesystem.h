@@ -1,68 +1,116 @@
 #pragma once
-#include "../JsLibrary.h"
-#include <functional>
-#include <thread>
-#include "../../JsPlugin.h"
 #include <winrt/windows.storage.streams.h>
 
-class Filesystem : public JsLibrary {
-public:
-	JsValueRef initialize(JsValueRef parent) override;
-	Filesystem(JsScript* owner) : JsLibrary(owner, L"filesystem") {}
-private:
+#include <functional>
+#include <thread>
 
-	class FSAsyncOperation : public JsScript::AsyncOperation {
-	public:
-		
+#include "../../JsPlugin.h"
+#include "../JsLibrary.h"
 
-		std::wstring path = {};
+class Filesystem: public JsLibrary {
+  public:
+    JsValueRef initialize(JsValueRef parent) override;
 
-		int err = 0;
-		std::optional<std::vector<BYTE>> data = std::nullopt;
-		bool outData = true;
+    Filesystem(JsScript* owner) : JsLibrary(owner, L"filesystem") {}
 
-		virtual void getArgs() override;
+  private:
+    class FSAsyncOperation: public JsScript::AsyncOperation {
+      public:
+        std::wstring path = {};
 
-		FSAsyncOperation(JsValueRef callback, decltype(initFunc) initFunc, void* param)
-			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
-		{
-		}
-	};
+        int err = 0;
+        std::optional<std::vector<BYTE>> data = std::nullopt;
+        bool outData = true;
 
-	std::wstring getPath(std::wstring relPath);
+        virtual void getArgs() override;
 
-	static JsValueRef CALLBACK write(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK read(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK writeSync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK readSync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK existsSync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK createDirectorySync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK append(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK appendSync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK deleteFile(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK readdirSync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	static JsValueRef CALLBACK moveSync(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState);
-	
+        FSAsyncOperation(
+            JsValueRef callback,
+            decltype(initFunc) initFunc,
+            void* param
+        ) :
+            JsScript::AsyncOperation(true, callback, initFunc, param),
+            err(0),
+            data(std::nullopt) {}
+    };
+
+    std::wstring getPath(std::wstring relPath);
+
+    static JsValueRef CALLBACK write(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK read(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK writeSync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK readSync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK existsSync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK createDirectorySync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK append(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK appendSync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK deleteFile(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK readdirSync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
+    static JsValueRef CALLBACK moveSync(
+        JsValueRef callee,
+        bool isConstructor,
+        JsValueRef* arguments,
+        unsigned short argCount,
+        void* callbackState
+    );
 };

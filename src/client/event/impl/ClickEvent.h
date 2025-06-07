@@ -2,16 +2,28 @@
 #include "api/eventing/Event.h"
 #include "util/FNV32.h"
 
-class ClickEvent : public Cancellable {
-public:
-	static const uint32_t hash = TOHASH(ClickEvent);
+class ClickEvent: public Cancellable {
+  public:
+    static const uint32_t hash = TOHASH(ClickEvent);
 
-	[[nodiscard]] int getMouseButton() { return btn; }
-	[[nodiscard]] int isDown() { return downOrDelta; }
-	[[nodiscard]] char getWheelDelta() { return downOrDelta; }
+    [[nodiscard]]
+    int getMouseButton() {
+        return btn;
+    }
 
-	ClickEvent(int btn, char dod) : btn(btn), downOrDelta(dod) {}
-private:
-	int btn;
-	char downOrDelta;
+    [[nodiscard]]
+    int isDown() {
+        return downOrDelta;
+    }
+
+    [[nodiscard]]
+    char getWheelDelta() {
+        return downOrDelta;
+    }
+
+    ClickEvent(int btn, char dod) : btn(btn), downOrDelta(dod) {}
+
+  private:
+    int btn;
+    char downOrDelta;
 };

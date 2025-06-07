@@ -1,13 +1,23 @@
-#include "pch.h"
 #include "ComboCounter.h"
+
 #include <sdk/common/network/packet/ActorEventPacket.h>
 
-ComboCounter::ComboCounter() : TextModule("ComboCounter", LocalizeString::get("client.textmodule.comboCounter.name"),
-                                          LocalizeString::get("client.textmodule.comboCounter.desc"), HUD) {
-    prefix = TextValue(LocalizeString::get("client.textmodule.comboCounter.count.name"));
+#include "pch.h"
+
+ComboCounter::ComboCounter() :
+    TextModule(
+        "ComboCounter",
+        LocalizeString::get("client.textmodule.comboCounter.name"),
+        LocalizeString::get("client.textmodule.comboCounter.desc"),
+        HUD
+    ) {
+    prefix = TextValue(
+        LocalizeString::get("client.textmodule.comboCounter.count.name")
+    );
 
     listen<AttackEvent>((EventListenerFunc)&ComboCounter::onAttack);
-    listen<PacketReceiveEvent>((EventListenerFunc)&ComboCounter::onPacketReceive);
+    listen<PacketReceiveEvent>((EventListenerFunc)&ComboCounter::onPacketReceive
+    );
     listen<TickEvent>((EventListenerFunc)&ComboCounter::onTick);
 }
 
@@ -17,7 +27,7 @@ std::wstringstream ComboCounter::text(bool isDefault, bool inEditor) {
 
 void ComboCounter::onAttack(Event& evG) {
     auto& ev = reinterpret_cast<AttackEvent&>(evG);
-    
+
     auto ent = ev.getActor();
 
     if (ent->getRuntimeID() != lastRuntimeId) {
@@ -36,7 +46,8 @@ void ComboCounter::onPacketReceive(Event& evG) {
     if (pkt->getID() == SDK::PacketID::ACTOR_EVENT && hasHit) {
         auto actorEvent = static_cast<SDK::ActorEventPacket*>(pkt);
 
-        if (actorEvent->eventID == SDK::ActorEventID::HURT_ANIMATION && actorEvent->runtimeID == lastRuntimeId) {
+        if (actorEvent->eventID == SDK::ActorEventID::HURT_ANIMATION
+            && actorEvent->runtimeID == lastRuntimeId) {
             combo++;
             hasHit = false;
         }
