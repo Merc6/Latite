@@ -1,5 +1,6 @@
-#include "pch.h"
 #include "SetScorePacket.h"
+
+#include "pch.h"
 
 std::wstring SDK::SetScorePacket::serialize() const {
     nlohmann::json serialized;

@@ -4,13 +4,13 @@
 //-------------------------------------------------------------------------------------------------------
 
 #ifdef _MSC_VER
-#pragma once
+    #pragma once
 #endif // _MSC_VER
 
 #ifndef _CHAKRACOREWINDOWS_H_
-#define _CHAKRACOREWINDOWS_H_
+    #define _CHAKRACOREWINDOWS_H_
 
-#include <rpc.h>
+    #include <rpc.h>
 
 /// <summary>
 ///     Globally enables out-of-process JIT.
@@ -39,6 +39,10 @@ JsEnableOOPJIT();
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsConnectJITProcess(_In_ HANDLE processHandle, _In_opt_ void* serverSecurityDescriptor, _In_ UUID connectionId);
+JsConnectJITProcess(
+    _In_ HANDLE processHandle,
+    _In_opt_ void* serverSecurityDescriptor,
+    _In_ UUID connectionId
+);
 
 #endif // _CHAKRACOREWINDOWS_H_

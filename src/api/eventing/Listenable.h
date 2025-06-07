@@ -2,9 +2,11 @@
 
 // Abstract class
 class Listener {
-public:
-	Listener() = default;
-	virtual ~Listener() = default;
+  public:
+    Listener() = default;
+    virtual ~Listener() = default;
 
-	virtual bool shouldListen() { return true; }
+    virtual bool shouldListen() {
+        return true;
+    }
 };

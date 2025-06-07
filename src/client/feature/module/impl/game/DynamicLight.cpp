@@ -1,17 +1,23 @@
-#include "pch.h"
 #include "DynamicLight.h"
+
 #include "client/event/Eventing.h"
 #include "client/event/impl/TickEvent.h"
+#include "pch.h"
 
-DynamicLight::DynamicLight() : Module("DynamicLight", L"Dynamic Light", L"Makes the item you're holding emit light.", GAME) {
-	listen<TickEvent>((EventListenerFunc)&DynamicLight::onTick, true);
+DynamicLight::DynamicLight() :
+    Module(
+        "DynamicLight",
+        L"Dynamic Light",
+        L"Makes the item you're holding emit light.",
+        GAME
+    ) {
+    listen<TickEvent>((EventListenerFunc)&DynamicLight::onTick, true);
 }
 
-DynamicLight::~DynamicLight() {
-}
+DynamicLight::~DynamicLight() {}
 
 void DynamicLight::onTick(Event&) {
-	auto plr = SDK::ClientInstance::get()->getLocalPlayer();
-	if (!plr) return;
-	
+    auto plr = SDK::ClientInstance::get()->getLocalPlayer();
+    if (!plr)
+        return;
 }

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 namespace SDK {
-    struct ActorEquipmentComponent {
-        SDK::Inventory* handContainer;
-        SDK::Inventory* armorContainer;
-    };
-}
+struct ActorEquipmentComponent {
+    SDK::Inventory* handContainer;
+    SDK::Inventory* armorContainer;
+};
+} // namespace SDK

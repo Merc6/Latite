@@ -2,40 +2,57 @@
 #include "Listenable.h"
 
 class Event {
-public:
-	Event(Event&) = delete;
-	Event(Event&&) = delete;
-	Event() {}
+  public:
+    Event(Event&) = delete;
+    Event(Event&&) = delete;
 
-	[[nodiscard]] bool isCancellable() const { return cancellable; }
-protected:
-	bool cancellable = false;
-private:
+    Event() {}
+
+    [[nodiscard]]
+    bool isCancellable() const {
+        return cancellable;
+    }
+
+  protected:
+    bool cancellable = false;
+
+  private:
 };
 
-class Cancellable : public Event {
-	bool cancel = false;
-public:
-	Cancellable() {
-		cancellable = true;
-	}
+class Cancellable: public Event {
+    bool cancel = false;
 
-	void setCancelled(bool b = true) {
-		cancel = b;
-	}
+  public:
+    Cancellable() {
+        cancellable = true;
+    }
 
-	[[nodiscard]] bool isCancelled() const {
-		return cancel;
-	}
+    void setCancelled(bool b = true) {
+        cancel = b;
+    }
+
+    [[nodiscard]]
+    bool isCancelled() const {
+        return cancel;
+    }
 };
 
-using EventListenerFunc = void(Listener::*)(Event&);
+using EventListenerFunc = void (Listener::*)(Event&);
 
 struct EventListener {
-	constexpr EventListener(EventListenerFunc fp, Listener* ptr, bool callWhileInactive, int priority) : fptr(fp), listener(ptr), callWhileInactive(callWhileInactive), priority(priority) {}
+    constexpr EventListener(
+        EventListenerFunc fp,
+        Listener* ptr,
+        bool callWhileInactive,
+        int priority
+    ) :
+        fptr(fp),
+        listener(ptr),
+        callWhileInactive(callWhileInactive),
+        priority(priority) {}
 
-	EventListenerFunc fptr;
-	class Listener* listener;
-	int priority = 0;
-	bool callWhileInactive;
+    EventListenerFunc fptr;
+    class Listener* listener;
+    int priority = 0;
+    bool callWhileInactive;
 };

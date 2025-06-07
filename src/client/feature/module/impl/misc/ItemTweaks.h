@@ -1,14 +1,15 @@
 #pragma once
 #include "../../Module.h"
 
-class ItemTweaks : public Module {
-public:
-	ItemTweaks();
+class ItemTweaks: public Module {
+  public:
+    ItemTweaks();
 
-	void onItemRender(Event& ev);
+    void onItemRender(Event& ev);
 
-	virtual ~ItemTweaks() = default; // TODO: warn when no virtual destructor in virtual class
+    virtual ~ItemTweaks() =
+        default; // TODO: warn when no virtual destructor in virtual class
 
-private:
-	ValueType disableFlyingItemAnimation = BoolValue(false);
+  private:
+    ValueType disableFlyingItemAnimation = BoolValue(false);
 };

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
 class LevelData {
-public:
+  public:
     MVCLASS_FIELD(std::string, levelName, 0x370);
 };

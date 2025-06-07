@@ -1,6 +1,8 @@
-﻿#include "pch.h"
-#include "LocalizeData.h"
+﻿#include "LocalizeData.h"
+
 #include <client/Latite.h>
+
+#include "pch.h"
 #include "resource.h"
 
 LocalizeData::LocalizeData() {
@@ -27,7 +29,9 @@ LocalizeData::LocalizeData() {
     }
 }
 
-std::string LocalizeData::getResourceContent(const std::variant<int, std::string>& resource) {
+std::string LocalizeData::getResourceContent(
+    const std::variant<int, std::string>& resource
+) {
     if (auto res = std::get_if<int>(&resource)) {
         return Latite::get().getTextAsset(*res);
     }
@@ -40,18 +44,28 @@ void LocalizeData::loadLanguage(Language& lang, bool cache) {
     parseLangFile(lang, content, cache);
 }
 
-bool LocalizeData::parseLangFile(Language& lang, const std::string& content, bool cache) {
+bool LocalizeData::parseLangFile(
+    Language& lang,
+    const std::string& content,
+    bool cache
+) {
     auto obj = json::parse(content);
 
-    if (!obj.is_object()) return false;
-    if (!obj["name"].is_string()) return false;
-    if (!obj["translations"].is_object()) return false;
+    if (!obj.is_object())
+        return false;
+    if (!obj["name"].is_string())
+        return false;
+    if (!obj["translations"].is_object())
+        return false;
 
     lang.name = obj["name"].get<std::string>();
 
     if (cache) {
-        for (auto it = obj["translations"].begin(); it != obj["translations"].end(); ++it) {
-            lang.localizeCache[it.key()] = util::StrToWStr(it.value().get<std::string>());
+        for (auto it = obj["translations"].begin();
+             it != obj["translations"].end();
+             ++it) {
+            lang.localizeCache[it.key()] =
+                util::StrToWStr(it.value().get<std::string>());
         }
     }
 
@@ -60,12 +74,13 @@ bool LocalizeData::parseLangFile(Language& lang, const std::string& content, boo
 
 std::wstring LocalizeData::get(const std::string& id) {
     auto& lang = *languages.at(Latite::get().getSelectedLanguage());
-    return tryGetKey(lang, id)
-        .value_or(tryGetKey(*fallbackLanguage, id)
-            .value_or(util::StrToWStr(id)));
+    return tryGetKey(lang, id).value_or(
+        tryGetKey(*fallbackLanguage, id).value_or(util::StrToWStr(id))
+    );
 }
 
-std::optional<std::wstring> LocalizeData::tryGetKey(Language& lang, const std::string& key) {
+std::optional<std::wstring>
+LocalizeData::tryGetKey(Language& lang, const std::string& key) {
     auto& cache = lang.localizeCache;
     auto it = cache.find(key);
 

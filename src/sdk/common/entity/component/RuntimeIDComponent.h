@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 namespace SDK {
-    struct RuntimeIDComponent {
-        uint64_t runtimeID;
-    };
-}
+struct RuntimeIDComponent {
+    uint64_t runtimeID;
+};
+} // namespace SDK

@@ -1,9 +1,9 @@
 #pragma once
 #include "../../Module.h"
 
-class NoHurtCam : public Module {
-public:
-	NoHurtCam();
+class NoHurtCam: public Module {
+  public:
+    NoHurtCam();
 
-	void onBobHurt(Event& ev);
+    void onBobHurt(Event& ev);
 };

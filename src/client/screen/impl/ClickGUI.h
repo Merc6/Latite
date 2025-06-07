@@ -1,118 +1,131 @@
 #pragma once
+#include <array>
+#include <map>
+#include <memory>
+#include <optional>
+
 #include "../Screen.h"
 #include "client/render/asset/Asset.h"
 #include "client/ui/TextBox.h"
-#include <memory>
-#include <array>
-#include <map>
-#include <optional>
 
-class ClickGUI : public Screen {
-public:
-	ClickGUI();
+class ClickGUI: public Screen {
+  public:
+    ClickGUI();
 
-	void onRender(class Event& ev);
-	void onCleanup(Event& ev);
-	void onInit(Event& ev);
-	void onKey(Event& ev);
-	void onClick(Event& ev);
+    void onRender(class Event& ev);
+    void onCleanup(Event& ev);
+    void onInit(Event& ev);
+    void onKey(Event& ev);
+    void onClick(Event& ev);
 
-	std::string getName() override { return "ClickGUI"; }
-	float drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class D2DUtil& dc, float size = 150.f, float fTextWidth = 0.21f, bool bypassClickThrough = false);
-	
-	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
+    std::string getName() override {
+        return "ClickGUI";
+    }
 
-	void drawColorPicker();
+    float drawSetting(
+        class Setting* set,
+        class SettingGroup* group,
+        struct Vec2 const& pos,
+        class D2DUtil& dc,
+        float size = 150.f,
+        float fTextWidth = 0.21f,
+        bool bypassClickThrough = false
+    );
 
-	void jumpToModule(std::string const& name) {
-		jumpModule = name;
-		modTab = ALL;
-	}
-protected:
-	void onEnable(bool ignoreAnims) override;
-	void onDisable() override;
-private:
-	struct ColorPicker {
-		Setting* setting = nullptr;
-		StoredColor* selectedColor = nullptr;
-		HSV pickerColor = {};
-		float svModX = 1.f;
-		float svModY = 0.f;
-		float hueMod = 0.f;
-		float opacityMod = 1.f;
+    bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
 
-		bool isEditingHue = false;
-		bool isEditingOpacity = false;
-		bool isEditingSV = false;
+    void drawColorPicker();
 
-		bool queueClose = false;
-		bool dragging = false;
-		Vec2 dragOffs = {};
-		ValueType rgbSelector = BoolValue(false);
+    void jumpToModule(std::string const& name) {
+        jumpModule = name;
+        modTab = ALL;
+    }
 
-		Setting rgbSetting = Setting{ "colorpickerrgb", L"RGB", L"Cycle through a rainbow of colors for this setting" };
+  protected:
+    void onEnable(bool ignoreAnims) override;
+    void onDisable() override;
 
-		ColorPicker() {
-			rgbSetting.value = &rgbSelector;
-		}
-	} colorPicker{};
+  private:
+    struct ColorPicker {
+        Setting* setting = nullptr;
+        StoredColor* selectedColor = nullptr;
+        HSV pickerColor = {};
+        float svModX = 1.f;
+        float svModY = 0.f;
+        float hueMod = 0.f;
+        float opacityMod = 1.f;
 
-	ui::TextBox searchTextBox{};
-	std::vector<ui::TextBox> pickerTextBoxes{};
+        bool isEditingHue = false;
+        bool isEditingOpacity = false;
+        bool isEditingSV = false;
 
-	ComPtr<ID2D1Bitmap1> shadowBitmap;
-	ComPtr<ID2D1Bitmap1> auxiliaryBitmap;
-	ComPtr<ID2D1Bitmap1> modHoverBitmap;
-	ComPtr<ID2D1ImageBrush> clipBrush;
-	std::optional<d2d::Rect> modClip = {};
+        bool queueClose = false;
+        bool dragging = false;
+        Vec2 dragOffs = {};
+        ValueType rgbSelector = BoolValue(false);
 
-	enum Tab {
-		MODULES = 0,
-		SETTINGS,
-	} tab = MODULES;
+        Setting rgbSetting = Setting {
+            "colorpickerrgb",
+            L"RGB",
+            L"Cycle through a rainbow of colors for this setting"
+        };
 
-	enum ModTab {
-		ALL = 0,
-		GAME,
-		HUD,
-		SCRIPT
-	} modTab = ALL;
+        ColorPicker() {
+            rgbSetting.value = &rgbSelector;
+        }
+    } colorPicker {};
 
-	struct ModContainer {
-		std::wstring name;
-		std::wstring description;
-		std::wstring pluginName = L"";
-		std::shared_ptr<class IModule> mod;
-		bool shouldRender = true;
-		bool isExtended = false;
-		bool isMarketScript = false;
-		Vec2 previewSize = {};
-		float arrowRot = 180.f;
-		float lerpArrowRot = 1.f;
-		float lerpToggle = 0.f;
-		float lerpHover = 0.f;
-		Color toggleColorOn = {};
-		Color toggleColorOff = {};
-		std::optional<d2d::Rect> modRect = std::nullopt;
+    ui::TextBox searchTextBox {};
+    std::vector<ui::TextBox> pickerTextBoxes {};
 
-		static bool compare(ModContainer const& a, ModContainer const& b) {
-			return (a.name < b.name) || (!a.isMarketScript && b.isMarketScript);
-		}
-	};
+    ComPtr<ID2D1Bitmap1> shadowBitmap;
+    ComPtr<ID2D1Bitmap1> auxiliaryBitmap;
+    ComPtr<ID2D1Bitmap1> modHoverBitmap;
+    ComPtr<ID2D1ImageBrush> clipBrush;
+    std::optional<d2d::Rect> modClip = {};
 
-	std::map<Setting*, std::shared_ptr<ui::TextBox>> settingBoxes = {};
+    enum Tab {
+        MODULES = 0,
+        SETTINGS,
+    } tab = MODULES;
 
-	d2d::Rect rect = {};
-	d2d::Rect cPickerRect = {};
+    enum ModTab { ALL = 0, GAME, HUD, SCRIPT } modTab = ALL;
 
-	Setting* activeSetting = nullptr;
-	int capturedKey = 0;
-	float adaptedScale = 0.f;
+    struct ModContainer {
+        std::wstring name;
+        std::wstring description;
+        std::wstring pluginName = L"";
+        std::shared_ptr<class IModule> mod;
+        bool shouldRender = true;
+        bool isExtended = false;
+        bool isMarketScript = false;
+        Vec2 previewSize = {};
+        float arrowRot = 180.f;
+        float lerpArrowRot = 1.f;
+        float lerpToggle = 0.f;
+        float lerpHover = 0.f;
+        Color toggleColorOn = {};
+        Color toggleColorOff = {};
+        std::optional<d2d::Rect> modRect = std::nullopt;
 
-	float scrollMax = 0.f;
-	float scroll = 0.f;
-	float lerpScroll = 0.f;
+        static bool compare(ModContainer const& a, ModContainer const& b) {
+            return (a.name < b.name) || (!a.isMarketScript && b.isMarketScript);
+        }
+    };
 
-	std::optional<std::string> jumpModule;
-	ComPtr<ID2D1Effect> compositeEffect;
+    std::map<Setting*, std::shared_ptr<ui::TextBox>> settingBoxes = {};
+
+    d2d::Rect rect = {};
+    d2d::Rect cPickerRect = {};
+
+    Setting* activeSetting = nullptr;
+    int capturedKey = 0;
+    float adaptedScale = 0.f;
+
+    float scrollMax = 0.f;
+    float scroll = 0.f;
+    float lerpScroll = 0.f;
+
+    std::optional<std::string> jumpModule;
+    ComPtr<ID2D1Effect> compositeEffect;
 };

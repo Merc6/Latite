@@ -1,19 +1,25 @@
 #pragma once
-#include "../../HUDModule.h"
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-class MovableScoreboard : public HUDModule {
-public:
-	MovableScoreboard();
+#include "../../HUDModule.h"
 
-	[[nodiscard]] virtual bool forceMinecraftRenderer() override { return true; }
-	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor);
+class MovableScoreboard: public HUDModule {
+  public:
+    MovableScoreboard();
 
-	void onRenderLayer(Event& ev);
+    [[nodiscard]]
+    virtual bool forceMinecraftRenderer() override {
+        return true;
+    }
 
-	void updatePos();
-private:
-	SDK::UIControl* sidebar;
+    virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor);
 
-	Vec2 newPos = {};
+    void onRenderLayer(Event& ev);
+
+    void updatePos();
+
+  private:
+    SDK::UIControl* sidebar;
+
+    Vec2 newPos = {};
 };

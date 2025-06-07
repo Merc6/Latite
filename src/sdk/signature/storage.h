@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef LATITE_DEBUG
-#define API_NAMES
+    #define API_NAMES
 #endif
 
 #include "api/memory/signature/signature.h"
@@ -13,12 +13,17 @@ if (sdk::internalVers == sdk::VLATEST) return Signatures::__VA_ARGS__;\
 else { return Signatures_1_18_12::__VA_ARGS__; }\
 })()*/
 
-class SigImpl : public memory::signature_store {
-public:
-	explicit SigImpl() : signature_store(nullptr, this->on_resolve, std::nullopt, "") {};
+class SigImpl: public memory::signature_store {
+  public:
+    explicit SigImpl() :
+        signature_store(nullptr, this->on_resolve, std::nullopt, "") {};
 
-	explicit SigImpl(decltype(on_resolve) onResolve, mnem::signature sig, std::string_view name) : signature_store("Minecraft.Windows.exe", onResolve, sig, name) {
-	}
+    explicit SigImpl(
+        decltype(on_resolve) onResolve,
+        mnem::signature sig,
+        std::string_view name
+    ) :
+        signature_store("Minecraft.Windows.exe", onResolve, sig, name) {}
 };
 
 #include "storage_latest.h"

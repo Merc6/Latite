@@ -15,21 +15,21 @@
 /// This file contains a flat C API layer. This is the API exported by ChakraCore.dll.
 
 #ifdef _MSC_VER
-#pragma once
+    #pragma once
 #endif // _MSC_VER
 
 #ifndef _CHAKRACORE_H_
-#define _CHAKRACORE_H_
+    #define _CHAKRACORE_H_
 
-#if !defined(NTBUILD) && !defined(_CHAKRACOREBUILD)
-#define _CHAKRACOREBUILD
-#endif
+    #if !defined(NTBUILD) && !defined(_CHAKRACOREBUILD)
+        #define _CHAKRACOREBUILD
+    #endif
 
-#include "ChakraCommon.h"
-#include "ChakraDebug.h"
+    #include "ChakraCommon.h"
+    #include "ChakraDebug.h"
 
-// Begin ChakraCore only APIs
-#ifdef _CHAKRACOREBUILD
+    // Begin ChakraCore only APIs
+    #ifdef _CHAKRACOREBUILD
 
 /// <summary>
 ///     A reference to an ES module.
@@ -46,7 +46,7 @@ typedef void* JsModuleRecord;
 ///     This represents SharedContents which is heap allocated object, it can be passed through
 ///     different runtimes to share the underlying buffer.
 /// </remarks>
-typedef void *JsSharedArrayBufferContentHandle;
+typedef void* JsSharedArrayBufferContentHandle;
 
 /// <summary>
 ///     A reference to a SCA Serializer.
@@ -54,7 +54,7 @@ typedef void *JsSharedArrayBufferContentHandle;
 /// <remarks>
 ///     This represents the internal state of a Serializer
 /// </remarks>
-typedef void *JsVarSerializerHandle;
+typedef void* JsVarSerializerHandle;
 
 /// <summary>
 ///     A reference to a SCA Deserializer.
@@ -62,14 +62,12 @@ typedef void *JsVarSerializerHandle;
 /// <remarks>
 ///     This represents the internal state of a Deserializer
 /// </remarks>
-typedef void *JsVarDeserializerHandle;
-
+typedef void* JsVarDeserializerHandle;
 
 /// <summary>
 ///     Flags for parsing a module.
 /// </summary>
-typedef enum JsParseModuleSourceFlags
-{
+typedef enum JsParseModuleSourceFlags {
     /// <summary>
     ///     Module source is UTF16.
     /// </summary>
@@ -86,8 +84,7 @@ typedef enum JsParseModuleSourceFlags
 /// <remarks>
 ///     For more information see JsSetModuleHostInfo.
 /// </remarks>
-typedef enum JsModuleHostInfoKind
-{
+typedef enum JsModuleHostInfoKind {
     /// <summary>
     ///     An exception object - e.g. if the module file cannot be found.
     /// </summary>
@@ -125,8 +122,7 @@ typedef enum JsModuleHostInfoKind
 /// <summary>
 ///     The possible states for a Promise object.
 /// </summary>
-typedef enum _JsPromiseState
-{
+typedef enum _JsPromiseState {
     JsPromiseStatePending = 0x0,
     JsPromiseStateFulfilled = 0x1,
     JsPromiseStateRejected = 0x2
@@ -136,8 +132,8 @@ typedef enum _JsPromiseState
 ///     User implemented callback to fetch additional imported modules in ES modules.
 /// </summary>
 /// <remarks>
-///     The callback is invoked on the current runtime execution thread, therefore execution is blocked until 
-///     the callback completes. Notify the host to fetch the dependent module. This is the "import" part 
+///     The callback is invoked on the current runtime execution thread, therefore execution is blocked until
+///     the callback completes. Notify the host to fetch the dependent module. This is the "import" part
 ///     before HostResolveImportedModule in ES6 spec. This notifies the host that the referencing module has
 ///     the specified module dependency, and the host needs to retrieve the module back.
 ///
@@ -149,13 +145,17 @@ typedef enum _JsPromiseState
 /// </remarks>
 /// <param name="referencingModule">The referencing module that is requesting the dependent module.</param>
 /// <param name="specifier">The specifier coming from the module source code.</param>
-/// <param name="dependentModuleRecord">The ModuleRecord of the dependent module. If the module was requested 
+/// <param name="dependentModuleRecord">The ModuleRecord of the dependent module. If the module was requested
 ///                                     before from other source, return the existing ModuleRecord, otherwise
 ///                                     return a newly created ModuleRecord.</param>
 /// <returns>
 ///     Returns a <c>JsNoError</c> if the operation succeeded an error code otherwise.
 /// </returns>
-typedef JsErrorCode(CHAKRA_CALLBACK * FetchImportedModuleCallBack)(_In_ JsModuleRecord referencingModule, _In_ JsValueRef specifier, _Outptr_result_maybenull_ JsModuleRecord* dependentModuleRecord);
+typedef JsErrorCode(CHAKRA_CALLBACK* FetchImportedModuleCallBack)(
+    _In_ JsModuleRecord referencingModule,
+    _In_ JsValueRef specifier,
+    _Outptr_result_maybenull_ JsModuleRecord* dependentModuleRecord
+);
 
 /// <summary>
 ///     User implemented callback to fetch imported modules dynamically in scripts.
@@ -178,7 +178,11 @@ typedef JsErrorCode(CHAKRA_CALLBACK * FetchImportedModuleCallBack)(_In_ JsModule
 /// <returns>
 ///     Returns <c>JsNoError</c> if the operation succeeded or an error code otherwise.
 /// </returns>
-typedef JsErrorCode(CHAKRA_CALLBACK * FetchImportedModuleFromScriptCallBack)(_In_ JsSourceContext dwReferencingSourceContext, _In_ JsValueRef specifier, _Outptr_result_maybenull_ JsModuleRecord* dependentModuleRecord);
+typedef JsErrorCode(CHAKRA_CALLBACK* FetchImportedModuleFromScriptCallBack)(
+    _In_ JsSourceContext dwReferencingSourceContext,
+    _In_ JsValueRef specifier,
+    _Outptr_result_maybenull_ JsModuleRecord* dependentModuleRecord
+);
 
 /// <summary>
 ///     User implemented callback to get notification when the module is ready.
@@ -193,7 +197,10 @@ typedef JsErrorCode(CHAKRA_CALLBACK * FetchImportedModuleFromScriptCallBack)(_In
 /// <returns>
 ///     Returns a JsErrorCode - note, the return value is ignored.
 /// </returns>
-typedef JsErrorCode(CHAKRA_CALLBACK * NotifyModuleReadyCallback)(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar);
+typedef JsErrorCode(CHAKRA_CALLBACK* NotifyModuleReadyCallback)(
+    _In_opt_ JsModuleRecord referencingModule,
+    _In_opt_ JsValueRef exceptionVar
+);
 
 /// <summary>
 ///     User implemented callback to fill in module properties for the import.meta object.
@@ -209,7 +216,10 @@ typedef JsErrorCode(CHAKRA_CALLBACK * NotifyModuleReadyCallback)(_In_opt_ JsModu
 /// <returns>
 ///     Returns a JsErrorCode - note, the return value is ignored.
 /// </returns>
-typedef JsErrorCode(CHAKRA_CALLBACK * InitializeImportMetaCallback)(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef importMetaVar);
+typedef JsErrorCode(CHAKRA_CALLBACK* InitializeImportMetaCallback)(
+    _In_opt_ JsModuleRecord referencingModule,
+    _In_opt_ JsValueRef importMetaVar
+);
 
 /// <summary>
 ///     User implemented callback to report completion of module execution.
@@ -230,17 +240,19 @@ typedef JsErrorCode(CHAKRA_CALLBACK * InitializeImportMetaCallback)(_In_opt_ JsM
 /// <returns>
 ///     Returns a JsErrorCode: JsNoError if successful.
 /// </returns>
-typedef JsErrorCode(CHAKRA_CALLBACK * ReportModuleCompletionCallback)(_In_ JsModuleRecord module, _In_opt_ JsValueRef exception);
+typedef JsErrorCode(CHAKRA_CALLBACK* ReportModuleCompletionCallback)(
+    _In_ JsModuleRecord module,
+    _In_opt_ JsValueRef exception
+);
 
 /// <summary>
 ///     A structure containing information about a native function callback.
 /// </summary>
-typedef struct JsNativeFunctionInfo
-{
+typedef struct JsNativeFunctionInfo {
     JsValueRef thisArg;
     JsValueRef newTargetArg;
     bool isConstructCall;
-}JsNativeFunctionInfo;
+} JsNativeFunctionInfo;
 
 /// <summary>
 ///     A function callback.
@@ -255,7 +267,13 @@ typedef struct JsNativeFunctionInfo
 ///     The state passed to <c>JsCreateFunction</c>.
 /// </param>
 /// <returns>The result of the call, if any.</returns>
-typedef _Ret_maybenull_ JsValueRef(CHAKRA_CALLBACK * JsEnhancedNativeFunction)(_In_ JsValueRef callee, _In_ JsValueRef *arguments, _In_ unsigned short argumentCount, _In_ JsNativeFunctionInfo *info, _In_opt_ void *callbackState);
+typedef _Ret_maybenull_ JsValueRef(CHAKRA_CALLBACK* JsEnhancedNativeFunction)(
+    _In_ JsValueRef callee,
+    _In_ JsValueRef* arguments,
+    _In_ unsigned short argumentCount,
+    _In_ JsNativeFunctionInfo* info,
+    _In_opt_ void* callbackState
+);
 
 /// <summary>
 ///     A Promise Rejection Tracker callback.
@@ -268,15 +286,20 @@ typedef _Ret_maybenull_ JsValueRef(CHAKRA_CALLBACK * JsEnhancedNativeFunction)(_
 ///     Note - per draft ECMASpec 2018 25.4.1.9 this function should not set or return an exception
 ///     Note also the promise and reason parameters may be garbage collected after this function is called
 ///     if you wish to make further use of them you will need to use JsAddRef to preserve them
-///     However if you use JsAddRef you must also call JsRelease and not hold unto them after 
+///     However if you use JsAddRef you must also call JsRelease and not hold unto them after
 ///     a handled notification (both per spec and to avoid memory leaks)
 /// </remarks>
 /// <param name="promise">The promise object, represented as a JsValueRef.</param>
 /// <param name="reason">The value/cause of the rejection, represented as a JsValueRef.</param>
-/// <param name="handled">Boolean - false for promiseRejected: i.e. if the promise has just been rejected with no handler, 
+/// <param name="handled">Boolean - false for promiseRejected: i.e. if the promise has just been rejected with no handler,
 ///                         true for promiseHandled: i.e. if it was rejected before without a handler and is now being handled.</param>
 /// <param name="callbackState">The state passed to <c>JsSetHostPromiseRejectionTracker</c>.</param>
-typedef void (CHAKRA_CALLBACK *JsHostPromiseRejectionTrackerCallback)(_In_ JsValueRef promise, _In_ JsValueRef reason, _In_ bool handled, _In_opt_ void *callbackState);
+typedef void(CHAKRA_CALLBACK* JsHostPromiseRejectionTrackerCallback)(
+    _In_ JsValueRef promise,
+    _In_ JsValueRef reason,
+    _In_ bool handled,
+    _In_opt_ void* callbackState
+);
 
 /// <summary>
 ///     A structure containing information about interceptors.
@@ -296,17 +319,21 @@ typedef struct _JsGetterSetterInterceptor {
 /// <summary>
 ///     A callback for tracing references back from Chakra to DOM wrappers.
 /// </summary>
-typedef void (CHAKRA_CALLBACK *JsDOMWrapperTracingCallback)(_In_opt_ void *data);
+typedef void(CHAKRA_CALLBACK* JsDOMWrapperTracingCallback)(_In_opt_ void* data);
 
 /// <summary>
 ///     A callback for checking whether tracing from Chakra to DOM wrappers has completed.
 /// </summary>
-typedef bool (CHAKRA_CALLBACK *JsDOMWrapperTracingDoneCallback)(_In_opt_ void *data);
+typedef bool(CHAKRA_CALLBACK* JsDOMWrapperTracingDoneCallback)(
+    _In_opt_ void* data
+);
 
 /// <summary>
 ///     A callback for entering final pause for tracing DOM wrappers.
 /// </summary>
-typedef void(CHAKRA_CALLBACK *JsDOMWrapperTracingEnterFinalPauseCallback)(_In_opt_ void *data);
+typedef void(CHAKRA_CALLBACK* JsDOMWrapperTracingEnterFinalPauseCallback)(
+    _In_opt_ void* data
+);
 
 /// <summary>
 ///     A trace callback.
@@ -314,7 +341,7 @@ typedef void(CHAKRA_CALLBACK *JsDOMWrapperTracingEnterFinalPauseCallback)(_In_op
 /// <param name="data">
 ///     The external data that was passed in when creating the object being traced.
 /// </param>
-typedef void (CHAKRA_CALLBACK *JsTraceCallback)(_In_opt_ void *data);
+typedef void(CHAKRA_CALLBACK* JsTraceCallback)(_In_opt_ void* data);
 
 /// <summary>
 ///     Creates a new enhanced JavaScript function.
@@ -335,8 +362,9 @@ CHAKRA_API
 JsCreateEnhancedFunction(
     _In_ JsEnhancedNativeFunction nativeFunction,
     _In_opt_ JsValueRef metadata,
-    _In_opt_ void *callbackState,
-    _Out_ JsValueRef *function);
+    _In_opt_ void* callbackState,
+    _Out_ JsValueRef* function
+);
 
 /// <summary>
 ///     Initialize a ModuleRecord from host
@@ -354,7 +382,8 @@ CHAKRA_API
 JsInitializeModuleRecord(
     _In_opt_ JsModuleRecord referencingModule,
     _In_opt_ JsValueRef normalizedSpecifier,
-    _Outptr_result_maybenull_ JsModuleRecord* moduleRecord);
+    _Outptr_result_maybenull_ JsModuleRecord* moduleRecord
+);
 
 /// <summary>
 ///     Parse the source for an ES module
@@ -381,7 +410,8 @@ JsParseModuleSource(
     _In_ BYTE* script,
     _In_ unsigned int scriptLength,
     _In_ JsParseModuleSourceFlags sourceFlag,
-    _Outptr_result_maybenull_ JsValueRef* exceptionValueRef);
+    _Outptr_result_maybenull_ JsValueRef* exceptionValueRef
+);
 
 /// <summary>
 ///     Execute module code.
@@ -401,7 +431,8 @@ JsParseModuleSource(
 CHAKRA_API
 JsModuleEvaluation(
     _In_ JsModuleRecord requestModule,
-    _Outptr_result_maybenull_ JsValueRef* result);
+    _Outptr_result_maybenull_ JsValueRef* result
+);
 
 /// <summary>
 ///     Set host info for the specified module.
@@ -430,7 +461,8 @@ CHAKRA_API
 JsSetModuleHostInfo(
     _In_opt_ JsModuleRecord requestModule,
     _In_ JsModuleHostInfoKind moduleHostInfo,
-    _In_ void* hostInfo);
+    _In_ void* hostInfo
+);
 
 /// <summary>
 ///     Retrieve the host info for the specified module.
@@ -446,9 +478,10 @@ JsSetModuleHostInfo(
 /// </returns>
 CHAKRA_API
 JsGetModuleHostInfo(
-    _In_  JsModuleRecord requestModule,
+    _In_ JsModuleRecord requestModule,
     _In_ JsModuleHostInfoKind moduleHostInfo,
-    _Outptr_result_maybenull_ void** hostInfo);
+    _Outptr_result_maybenull_ void** hostInfo
+);
 
 /// <summary>
 ///     Returns metadata relating to the exception that caused the runtime of the current context
@@ -480,8 +513,7 @@ JsGetModuleHostInfo(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsGetAndClearExceptionWithMetadata(
-    _Out_ JsValueRef *metadata);
+JsGetAndClearExceptionWithMetadata(_Out_ JsValueRef* metadata);
 
 /// <summary>
 ///     Called by the runtime to load the source code of the serialized script.
@@ -491,9 +523,11 @@ JsGetAndClearExceptionWithMetadata(
 /// <returns>
 ///     true if the operation succeeded, false otherwise.
 /// </returns>
-typedef bool (CHAKRA_CALLBACK * JsSerializedLoadScriptCallback)
-    (JsSourceContext sourceContext, _Out_ JsValueRef *value,
-    _Out_ JsParseScriptAttributes *parseAttributes);
+typedef bool(CHAKRA_CALLBACK* JsSerializedLoadScriptCallback)(
+    JsSourceContext sourceContext,
+    _Out_ JsValueRef* value,
+    _Out_ JsParseScriptAttributes* parseAttributes
+);
 
 /// <summary>
 ///     Create JavascriptString variable from ASCII or Utf8 string
@@ -513,10 +547,11 @@ typedef bool (CHAKRA_CALLBACK * JsSerializedLoadScriptCallback)
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCreateString(
-        _In_ const char *content,
-        _In_ size_t length,
-        _Out_ JsValueRef *value);
+JsCreateString(
+    _In_ const char* content,
+    _In_ size_t length,
+    _Out_ JsValueRef* value
+);
 
 /// <summary>
 ///     Create JavascriptString variable from Utf16 string
@@ -536,10 +571,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCreateStringUtf16(
-        _In_ const uint16_t *content,
-        _In_ size_t length,
-        _Out_ JsValueRef *value);
+JsCreateStringUtf16(
+    _In_ const uint16_t* content,
+    _In_ size_t length,
+    _Out_ JsValueRef* value
+);
 
 /// <summary>
 ///     Write JavascriptString value into C string buffer (Utf8)
@@ -559,11 +595,12 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCopyString(
-        _In_ JsValueRef value,
-        _Out_opt_ char* buffer,
-        _In_ size_t bufferSize,
-        _Out_opt_ size_t* length);
+JsCopyString(
+    _In_ JsValueRef value,
+    _Out_opt_ char* buffer,
+    _In_ size_t bufferSize,
+    _Out_opt_ size_t* length
+);
 
 /// <summary>
 ///     Write string value into Utf16 string buffer
@@ -591,12 +628,13 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCopyStringUtf16(
-        _In_ JsValueRef value,
-        _In_ int start,
-        _In_ int length,
-        _Out_opt_ uint16_t* buffer,
-        _Out_opt_ size_t* written);
+JsCopyStringUtf16(
+    _In_ JsValueRef value,
+    _In_ int start,
+    _In_ int length,
+    _Out_opt_ uint16_t* buffer,
+    _Out_opt_ size_t* written
+);
 
 /// <summary>
 ///     Parses a script and returns a function representing the script.
@@ -626,12 +664,13 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsParse(
-        _In_ JsValueRef script,
-        _In_ JsSourceContext sourceContext,
-        _In_ JsValueRef sourceUrl,
-        _In_ JsParseScriptAttributes parseAttributes,
-        _Out_ JsValueRef *result);
+JsParse(
+    _In_ JsValueRef script,
+    _In_ JsSourceContext sourceContext,
+    _In_ JsValueRef sourceUrl,
+    _In_ JsParseScriptAttributes parseAttributes,
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Executes a script.
@@ -661,12 +700,13 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsRun(
-        _In_ JsValueRef script,
-        _In_ JsSourceContext sourceContext,
-        _In_ JsValueRef sourceUrl,
-        _In_ JsParseScriptAttributes parseAttributes,
-        _Out_ JsValueRef *result);
+JsRun(
+    _In_ JsValueRef script,
+    _In_ JsSourceContext sourceContext,
+    _In_ JsValueRef sourceUrl,
+    _In_ JsParseScriptAttributes parseAttributes,
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Creates the property ID associated with the name.
@@ -689,10 +729,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCreatePropertyId(
-        _In_z_ const char *name,
-        _In_ size_t length,
-        _Out_ JsPropertyIdRef *propertyId);
+JsCreatePropertyId(
+    _In_z_ const char* name,
+    _In_ size_t length,
+    _Out_ JsPropertyIdRef* propertyId
+);
 
 /// <summary>
 ///     Creates the property ID associated with the name.
@@ -716,9 +757,10 @@ CHAKRA_API
 /// </returns>
 CHAKRA_API
 JsCreatePropertyString(
-    _In_z_ const char *name,
+    _In_z_ const char* name,
     _In_ size_t length,
-    _Out_ JsValueRef* propertyString);
+    _Out_ JsValueRef* propertyString
+);
 
 /// <summary>
 ///     Copies the name associated with the property ID into a buffer.
@@ -741,11 +783,12 @@ JsCreatePropertyString(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCopyPropertyId(
-        _In_ JsPropertyIdRef propertyId,
-        _Out_ char* buffer,
-        _In_ size_t bufferSize,
-        _Out_ size_t* length);
+JsCopyPropertyId(
+    _In_ JsPropertyIdRef propertyId,
+    _Out_ char* buffer,
+    _In_ size_t bufferSize,
+    _Out_ size_t* length
+);
 
 /// <summary>
 ///     Serializes a parsed script to a buffer than can be reused.
@@ -776,10 +819,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsSerialize(
-        _In_ JsValueRef script,
-        _Out_ JsValueRef *buffer,
-        _In_ JsParseScriptAttributes parseAttributes);
+JsSerialize(
+    _In_ JsValueRef script,
+    _Out_ JsValueRef* buffer,
+    _In_ JsParseScriptAttributes parseAttributes
+);
 
 /// <summary>
 ///     Parses a serialized script and returns a function representing the script.
@@ -805,12 +849,13 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsParseSerialized(
-        _In_ JsValueRef buffer,
-        _In_ JsSerializedLoadScriptCallback scriptLoadCallback,
-        _In_ JsSourceContext sourceContext,
-        _In_ JsValueRef sourceUrl,
-        _Out_ JsValueRef *result);
+JsParseSerialized(
+    _In_ JsValueRef buffer,
+    _In_ JsSerializedLoadScriptCallback scriptLoadCallback,
+    _In_ JsSourceContext sourceContext,
+    _In_ JsValueRef sourceUrl,
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Runs a serialized script.
@@ -839,12 +884,13 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsRunSerialized(
-        _In_ JsValueRef buffer,
-        _In_ JsSerializedLoadScriptCallback scriptLoadCallback,
-        _In_ JsSourceContext sourceContext,
-        _In_ JsValueRef sourceUrl,
-        _Out_ JsValueRef *result);
+JsRunSerialized(
+    _In_ JsValueRef buffer,
+    _In_ JsSerializedLoadScriptCallback scriptLoadCallback,
+    _In_ JsSourceContext sourceContext,
+    _In_ JsValueRef sourceUrl,
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Gets the state of a given Promise object.
@@ -858,9 +904,7 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsGetPromiseState(
-        _In_ JsValueRef promise,
-        _Out_ JsPromiseState *state);
+JsGetPromiseState(_In_ JsValueRef promise, _Out_ JsPromiseState* state);
 
 /// <summary>
 ///     Gets the result of a given Promise object.
@@ -874,9 +918,7 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsGetPromiseResult(
-        _In_ JsValueRef promise,
-        _Out_ JsValueRef *result);
+JsGetPromiseResult(_In_ JsValueRef promise, _Out_ JsValueRef* result);
 
 /// <summary>
 ///     Creates a new JavaScript Promise object.
@@ -891,10 +933,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCreatePromise(
-        _Out_ JsValueRef *promise,
-        _Out_ JsValueRef *resolveFunction,
-        _Out_ JsValueRef *rejectFunction);
+JsCreatePromise(
+    _Out_ JsValueRef* promise,
+    _Out_ JsValueRef* resolveFunction,
+    _Out_ JsValueRef* rejectFunction
+);
 
 /// <summary>
 ///     A weak reference to a JavaScript value.
@@ -915,9 +958,7 @@ typedef JsRef JsWeakRef;
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCreateWeakReference(
-        _In_ JsValueRef value,
-        _Out_ JsWeakRef* weakRef);
+JsCreateWeakReference(_In_ JsValueRef value, _Out_ JsWeakRef* weakRef);
 
 /// <summary>
 ///     Gets a strong reference to the value referred to by a weak reference.
@@ -929,9 +970,7 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsGetWeakReferenceValue(
-        _In_ JsWeakRef weakRef,
-        _Out_ JsValueRef* value);
+JsGetWeakReferenceValue(_In_ JsWeakRef weakRef, _Out_ JsValueRef* value);
 
 /// <summary>
 ///     Creates a Javascript SharedArrayBuffer object with shared content get from JsGetSharedArrayBufferContent.
@@ -949,7 +988,8 @@ CHAKRA_API
 CHAKRA_API
 JsCreateSharedArrayBufferWithSharedContent(
     _In_ JsSharedArrayBufferContentHandle sharedContents,
-    _Out_ JsValueRef *result);
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Get the storage object from a SharedArrayBuffer.
@@ -968,7 +1008,8 @@ JsCreateSharedArrayBufferWithSharedContent(
 CHAKRA_API
 JsGetSharedArrayBufferContent(
     _In_ JsValueRef sharedArrayBuffer,
-    _Out_ JsSharedArrayBufferContentHandle *sharedContents);
+    _Out_ JsSharedArrayBufferContentHandle* sharedContents
+);
 
 /// <summary>
 ///     Decrease the reference count on a SharedArrayBuffer storage object.
@@ -984,7 +1025,8 @@ JsGetSharedArrayBufferContent(
 /// </returns>
 CHAKRA_API
 JsReleaseSharedArrayBufferContentHandle(
-    _In_ JsSharedArrayBufferContentHandle sharedContents);
+    _In_ JsSharedArrayBufferContentHandle sharedContents
+);
 
 /// <summary>
 ///     Determines whether an object has a non-inherited property.
@@ -999,10 +1041,11 @@ JsReleaseSharedArrayBufferContentHandle(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsHasOwnProperty(
-        _In_ JsValueRef object,
-        _In_ JsPropertyIdRef propertyId,
-        _Out_ bool *hasOwnProperty);
+JsHasOwnProperty(
+    _In_ JsValueRef object,
+    _In_ JsPropertyIdRef propertyId,
+    _Out_ bool* hasOwnProperty
+);
 
 /// <summary>
 ///     Determines whether an object has a non-inherited property.
@@ -1018,12 +1061,13 @@ CHAKRA_API
 ///     otherwise.
 /// </returns>
 CHAKRA_API
-    JsHasOwnItem(
-        _In_ JsValueRef object,
-        _In_ uint32_t index,
-        _Out_ bool* hasOwnItem);
+JsHasOwnItem(
+    _In_ JsValueRef object,
+    _In_ uint32_t index,
+    _Out_ bool* hasOwnItem
+);
 
-    /// <summary>
+/// <summary>
 ///     Write JS string value into char string buffer without a null terminator
 /// </summary>
 /// <remarks>
@@ -1059,7 +1103,8 @@ JsCopyStringOneByte(
     _In_ int start,
     _In_ int length,
     _Out_opt_ char* buffer,
-    _Out_opt_ size_t* written);
+    _Out_opt_ size_t* written
+);
 
 /// <summary>
 ///     Obtains frequently used properties of a data view.
@@ -1072,11 +1117,12 @@ JsCopyStringOneByte(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsGetDataViewInfo(
-        _In_ JsValueRef dataView,
-        _Out_opt_ JsValueRef *arrayBuffer,
-        _Out_opt_ unsigned int *byteOffset,
-        _Out_opt_ unsigned int *byteLength);
+JsGetDataViewInfo(
+    _In_ JsValueRef dataView,
+    _Out_opt_ JsValueRef* arrayBuffer,
+    _Out_opt_ unsigned int* byteOffset,
+    _Out_opt_ unsigned int* byteLength
+);
 
 /// <summary>
 ///     Determine if one JavaScript value is less than another JavaScript value.
@@ -1096,10 +1142,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsLessThan(
-        _In_ JsValueRef object1,
-        _In_ JsValueRef object2,
-        _Out_ bool *result);
+JsLessThan(
+    _In_ JsValueRef object1,
+    _In_ JsValueRef object2,
+    _Out_ bool* result
+);
 
 /// <summary>
 ///     Determine if one JavaScript value is less than or equal to another JavaScript value.
@@ -1119,10 +1166,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsLessThanOrEqual(
-        _In_ JsValueRef object1,
-        _In_ JsValueRef object2,
-        _Out_ bool *result);
+JsLessThanOrEqual(
+    _In_ JsValueRef object1,
+    _In_ JsValueRef object2,
+    _Out_ bool* result
+);
 
 /// <summary>
 ///     Creates a new object (with prototype) that stores some external data.
@@ -1140,11 +1188,12 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsCreateExternalObjectWithPrototype(
-        _In_opt_ void *data,
-        _In_opt_ JsFinalizeCallback finalizeCallback,
-        _In_opt_ JsValueRef prototype,
-        _Out_ JsValueRef *object);
+JsCreateExternalObjectWithPrototype(
+    _In_opt_ void* data,
+    _In_opt_ JsFinalizeCallback finalizeCallback,
+    _In_opt_ JsValueRef prototype,
+    _Out_ JsValueRef* object
+);
 
 /// <summary>
 ///     Creates a new object (with prototype) that stores some data.
@@ -1165,12 +1214,13 @@ CHAKRA_API
 /// </returns>
 CHAKRA_API
 JsCreateTracedExternalObject(
-    _In_opt_ void *data,
+    _In_opt_ void* data,
     _In_opt_ size_t inlineSlotSize,
     _In_opt_ JsTraceCallback traceCallback,
     _In_opt_ JsFinalizeCallback finalizeCallback,
     _In_opt_ JsValueRef prototype,
-    _Out_ JsValueRef *object);
+    _Out_ JsValueRef* object
+);
 
 /// <summary>
 ///     Creates a new object (with prototype) that stores some external data and also supports interceptors.
@@ -1189,62 +1239,63 @@ JsCreateTracedExternalObject(
 /// </returns>
 CHAKRA_API
 JsCreateCustomExternalObject(
-    _In_opt_ void *data,
+    _In_opt_ void* data,
     _In_opt_ size_t inlineSlotSize,
     _In_opt_ JsTraceCallback traceCallback,
     _In_opt_ JsFinalizeCallback finalizeCallback,
-    _Inout_opt_ JsGetterSetterInterceptor ** getterSetterInterceptor,
+    _Inout_opt_ JsGetterSetterInterceptor** getterSetterInterceptor,
     _In_opt_ JsValueRef prototype,
-    _Out_ JsValueRef * object);
+    _Out_ JsValueRef* object
+);
 
 /// <summary>
 ///     Returns a reference to the Array.Prototype.forEach function. The function is created if it's not already present.
 /// </summary>
 /// <param name="result">A reference to the Array.Prototype.forEach function.</param>
 CHAKRA_API
-JsGetArrayForEachFunction(_Out_ JsValueRef * result);
+JsGetArrayForEachFunction(_Out_ JsValueRef* result);
 
 /// <summary>
 ///     Returns a reference to the Array.Prototype.keys function. The function is created if it's not already present.
 /// </summary>
 /// <param name="result">A reference to the Array.Prototype.keys function.</param>
 CHAKRA_API
-JsGetArrayKeysFunction(_Out_ JsValueRef * result);
+JsGetArrayKeysFunction(_Out_ JsValueRef* result);
 
 /// <summary>
 ///     Returns a reference to the Array.Prototype.values function. The function is created if it's not already present.
 /// </summary>
 /// <param name="result">A reference to the Array.Prototype.values function.</param>
 CHAKRA_API
-JsGetArrayValuesFunction(_Out_ JsValueRef * result);
+JsGetArrayValuesFunction(_Out_ JsValueRef* result);
 
 /// <summary>
 ///     Returns a reference to the Array.Prototype.entries function. The function is created if it's not already present.
 /// </summary>
 /// <param name="result">A reference to the Array.Prototype.entries function.</param>
 CHAKRA_API
-JsGetArrayEntriesFunction(_Out_ JsValueRef * result);
+JsGetArrayEntriesFunction(_Out_ JsValueRef* result);
 
 /// <summary>
 ///     Returns the property id of the Symbol.iterator property.
 /// </summary>
 /// <param name="propertyId">The property id of the Symbol.iterator property.</param>
 CHAKRA_API
-JsGetPropertyIdSymbolIterator(_Out_ JsPropertyIdRef * propertyId);
+JsGetPropertyIdSymbolIterator(_Out_ JsPropertyIdRef* propertyId);
 
 /// <summary>
 ///     Returns a reference to the Javascript error prototype object.
 /// </summary>
 /// <param name="result">A reference to the Javascript error prototype object.</param>
 CHAKRA_API
-JsGetErrorPrototype(_Out_ JsValueRef * result);
+JsGetErrorPrototype(_Out_ JsValueRef* result);
 
 /// <summary>
 ///     Returns a reference to the Javascript iterator prototype object.
 /// </summary>
 /// <param name="result">A reference to the Javascript iterator prototype object.</param>
 CHAKRA_API
-JsGetIteratorPrototype(_Out_ JsValueRef * result);
+JsGetIteratorPrototype(_Out_ JsValueRef* result);
 
 /// <summary>
 ///      Returns a value that indicates whether an object is callable.
@@ -1258,9 +1309,7 @@ JsGetIteratorPrototype(_Out_ JsValueRef * result);
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsIsCallable(
-    _In_ JsValueRef object,
-    _Out_ bool *isCallable);
+JsIsCallable(_In_ JsValueRef object, _Out_ bool* isCallable);
 
 /// <summary>
 ///      Returns a value that indicates whether an object is a constructor.
@@ -1274,9 +1323,7 @@ JsIsCallable(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsIsConstructor(
-    _In_ JsValueRef object,
-    _Out_ bool *isConstructor);
+JsIsConstructor(_In_ JsValueRef object, _Out_ bool* isConstructor);
 
 /// <summary>
 ///     Clones an object
@@ -1289,9 +1336,7 @@ JsIsConstructor(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsCloneObject(
-    _In_ JsValueRef source,
-    _Out_ JsValueRef* clonedObject);
+JsCloneObject(_In_ JsValueRef source, _Out_ JsValueRef* clonedObject);
 
 /// <summary>
 ///     Determines whether an object has a private property.
@@ -1309,7 +1354,8 @@ CHAKRA_API
 JsPrivateHasProperty(
     _In_ JsValueRef object,
     _In_ JsValueRef key,
-    _Out_ bool *hasProperty);
+    _Out_ bool* hasProperty
+);
 
 /// <summary>
 ///     Gets an object's private property
@@ -1327,7 +1373,8 @@ CHAKRA_API
 JsPrivateGetProperty(
     _In_ JsValueRef object,
     _In_ JsValueRef key,
-    _Out_ JsValueRef *value);
+    _Out_ JsValueRef* value
+);
 
 /// <summary>
 ///     Puts an object's private property.
@@ -1345,7 +1392,8 @@ CHAKRA_API
 JsPrivateSetProperty(
     _In_ JsValueRef object,
     _In_ JsValueRef key,
-    _In_ JsValueRef value);
+    _In_ JsValueRef value
+);
 
 /// <summary>
 ///     Deletes an object's private property.
@@ -1363,7 +1411,8 @@ CHAKRA_API
 JsPrivateDeleteProperty(
     _In_ JsValueRef object,
     _In_ JsValueRef key,
-    _Out_ JsValueRef *result);
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Gets an object's property.
@@ -1378,10 +1427,11 @@ JsPrivateDeleteProperty(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectGetProperty(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _Out_ JsValueRef *value);
+JsObjectGetProperty(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _Out_ JsValueRef* value
+);
 
 /// <summary>
 ///     Puts an object's property.
@@ -1397,11 +1447,12 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectSetProperty(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _In_ JsValueRef value,
-        _In_ bool useStrictRules);
+JsObjectSetProperty(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _In_ JsValueRef value,
+    _In_ bool useStrictRules
+);
 
 /// <summary>
 ///     Determines whether an object has a property.
@@ -1416,10 +1467,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectHasProperty(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _Out_ bool *hasProperty);
+JsObjectHasProperty(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _Out_ bool* hasProperty
+);
 
 /// <summary>
 ///     Defines a new object's own property from a property descriptor.
@@ -1435,11 +1487,12 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectDefineProperty(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _In_ JsValueRef propertyDescriptor,
-        _Out_ bool *result);
+JsObjectDefineProperty(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _In_ JsValueRef propertyDescriptor,
+    _Out_ bool* result
+);
 
 /// <summary>
 ///     Defines a new object's own property from a property descriptor.
@@ -1464,7 +1517,8 @@ JsObjectDefinePropertyFull(
     _In_ bool writable,
     _In_ bool enumerable,
     _In_ bool configurable,
-    _Out_ bool *result);
+    _Out_ bool* result
+);
 
 /// <summary>
 ///     Deletes an object's property.
@@ -1480,11 +1534,12 @@ JsObjectDefinePropertyFull(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectDeleteProperty(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _In_ bool useStrictRules,
-        _Out_ JsValueRef *result);
+JsObjectDeleteProperty(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _In_ bool useStrictRules,
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Gets a property descriptor for an object's own property.
@@ -1499,10 +1554,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectGetOwnPropertyDescriptor(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _Out_ JsValueRef *propertyDescriptor);
+JsObjectGetOwnPropertyDescriptor(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _Out_ JsValueRef* propertyDescriptor
+);
 
 /// <summary>
 ///     Determines whether an object has a non-inherited property.
@@ -1517,10 +1573,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsObjectHasOwnProperty(
-        _In_ JsValueRef object,
-        _In_ JsValueRef key,
-        _Out_ bool *hasOwnProperty);
+JsObjectHasOwnProperty(
+    _In_ JsValueRef object,
+    _In_ JsValueRef key,
+    _Out_ bool* hasOwnProperty
+);
 
 /// <summary>
 ///     Sets whether any action should be taken when a promise is rejected with no reactions
@@ -1540,9 +1597,10 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsSetHostPromiseRejectionTracker(
-        _In_ JsHostPromiseRejectionTrackerCallback promiseRejectionTrackerCallback, 
-        _In_opt_ void *callbackState);
+JsSetHostPromiseRejectionTracker(
+    _In_ JsHostPromiseRejectionTrackerCallback promiseRejectionTrackerCallback,
+    _In_opt_ void* callbackState
+);
 
 /// <summary>
 ///     Retrieve the namespace object for a module.
@@ -1556,9 +1614,10 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsGetModuleNamespace(
-        _In_ JsModuleRecord requestModule,
-        _Outptr_result_maybenull_ JsValueRef *moduleNamespace);
+JsGetModuleNamespace(
+    _In_ JsModuleRecord requestModule,
+    _Outptr_result_maybenull_ JsValueRef* moduleNamespace
+);
 
 /// <summary>
 ///     Determines if a provided object is a JavscriptProxy Object and
@@ -1581,11 +1640,12 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsGetProxyProperties(
-        _In_ JsValueRef object,
-        _Out_ bool* isProxy,
-        _Out_opt_ JsValueRef* target,
-        _Out_opt_ JsValueRef* handler);
+JsGetProxyProperties(
+    _In_ JsValueRef object,
+    _Out_ bool* isProxy,
+    _Out_opt_ JsValueRef* target,
+    _Out_opt_ JsValueRef* handler
+);
 
 /// <summary>
 ///     Parses a script and stores the generated parser state cache into a buffer which can be reused.
@@ -1616,10 +1676,11 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsSerializeParserState(
-        _In_ JsValueRef scriptVal,
-        _Out_ JsValueRef *bufferVal,
-        _In_ JsParseScriptAttributes parseAttributes);
+JsSerializeParserState(
+    _In_ JsValueRef scriptVal,
+    _Out_ JsValueRef* bufferVal,
+    _In_ JsParseScriptAttributes parseAttributes
+);
 
 /// <summary>
 ///     Deserializes the cache of initial parser state and (along with the same
@@ -1653,13 +1714,14 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsRunScriptWithParserState(
-        _In_ JsValueRef script,
-        _In_ JsSourceContext sourceContext,
-        _In_ JsValueRef sourceUrl,
-        _In_ JsParseScriptAttributes parseAttributes,
-        _In_ JsValueRef parserState,
-        _Out_ JsValueRef * result);
+JsRunScriptWithParserState(
+    _In_ JsValueRef script,
+    _In_ JsSourceContext sourceContext,
+    _In_ JsValueRef sourceUrl,
+    _In_ JsParseScriptAttributes parseAttributes,
+    _In_ JsValueRef parserState,
+    _Out_ JsValueRef* result
+);
 
 /// <summary>
 ///     Deserializes the cache of initial parser state and (along with the same
@@ -1693,21 +1755,25 @@ CHAKRA_API
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-    JsDeserializeParserState(
-        _In_ JsValueRef script,
-        _In_ JsSourceContext sourceContext,
-        _In_ JsValueRef sourceUrl,
-        _In_ JsParseScriptAttributes parseAttributes,
-        _In_ JsValueRef parserState,
-        _Out_ JsValueRef* result);
+JsDeserializeParserState(
+    _In_ JsValueRef script,
+    _In_ JsSourceContext sourceContext,
+    _In_ JsValueRef sourceUrl,
+    _In_ JsParseScriptAttributes parseAttributes,
+    _In_ JsValueRef parserState,
+    _Out_ JsValueRef* result
+);
 
-typedef void (CHAKRA_CALLBACK *JsBeforeSweepCallback)(_In_opt_ void *callbackState);
+typedef void(CHAKRA_CALLBACK* JsBeforeSweepCallback)(
+    _In_opt_ void* callbackState
+);
 
 CHAKRA_API
-    JsSetRuntimeBeforeSweepCallback(
-        _In_ JsRuntimeHandle runtimeHandle,
-        _In_opt_ void *callbackState,
-        _In_ JsBeforeSweepCallback beforeSweepCallback);
+JsSetRuntimeBeforeSweepCallback(
+    _In_ JsRuntimeHandle runtimeHandle,
+    _In_opt_ void* callbackState,
+    _In_ JsBeforeSweepCallback beforeSweepCallback
+);
 
 CHAKRA_API
 JsSetRuntimeDomWrapperTracingCallbacks(
@@ -1715,20 +1781,21 @@ JsSetRuntimeDomWrapperTracingCallbacks(
     _In_ JsRef wrapperTracingState,
     _In_ JsDOMWrapperTracingCallback wrapperTracingCallback,
     _In_ JsDOMWrapperTracingDoneCallback wrapperTracingDoneCallback,
-    _In_ JsDOMWrapperTracingEnterFinalPauseCallback enterFinalPauseCallback);
+    _In_ JsDOMWrapperTracingEnterFinalPauseCallback enterFinalPauseCallback
+);
 
 CHAKRA_API
 JsTraceExternalReference(
-        _In_ JsRuntimeHandle runtimeHandle,
-        _In_ JsValueRef value
-    );
+    _In_ JsRuntimeHandle runtimeHandle,
+    _In_ JsValueRef value
+);
 
 CHAKRA_API
 JsAllocRawData(
     _In_ JsRuntimeHandle runtimeHandle,
     _In_ size_t sizeInBytes,
     _In_ bool zeroed,
-    _Out_ JsRef * buffer
+    _Out_ JsRef* buffer
 );
 
 /// <summary>
@@ -1741,7 +1808,12 @@ JsAllocRawData(
 /// <returns>
 ///     New buffer will be returned upon success, null otherwise.
 /// </returns>
-typedef byte * (CHAKRA_CALLBACK *ReallocateBufferMemoryFunc)(void* state, byte *oldBuffer, size_t newSize, size_t *allocatedSize);
+typedef byte*(CHAKRA_CALLBACK* ReallocateBufferMemoryFunc)(
+    void* state,
+    byte* oldBuffer,
+    size_t newSize,
+    size_t* allocatedSize
+);
 
 /// <summary>
 ///     A callback to ask host write current Host object to the serialization buffer.
@@ -1749,7 +1821,10 @@ typedef byte * (CHAKRA_CALLBACK *ReallocateBufferMemoryFunc)(void* state, byte *
 /// <returns>
 ///     A Boolean true is returned upon success, false otherwise.
 /// </returns>
-typedef bool (CHAKRA_CALLBACK *WriteHostObjectFunc)(void* state, void* hostObject);
+typedef bool(CHAKRA_CALLBACK* WriteHostObjectFunc)(
+    void* state,
+    void* hostObject
+);
 
 /// <summary>
 ///     Initialize Serialization of the object.
@@ -1765,8 +1840,9 @@ CHAKRA_API
 JsVarSerializer(
     _In_ ReallocateBufferMemoryFunc reallocateBufferMemory,
     _In_ WriteHostObjectFunc writeHostObject,
-    _In_opt_ void * callbackState,
-    _Out_ JsVarSerializerHandle *serializerHandle);
+    _In_opt_ void* callbackState,
+    _Out_ JsVarSerializerHandle* serializerHandle
+);
 
 /// <summary>
 ///     Write raw bytes to the buffer.
@@ -1780,7 +1856,8 @@ CHAKRA_API
 JsVarSerializerWriteRawBytes(
     _In_ JsVarSerializerHandle serializerHandle,
     _In_ const void* source,
-    _In_ size_t length);
+    _In_ size_t length
+);
 
 /// <summary>
 ///     A method to serialize given Javascript object to the serialization buffer
@@ -1792,7 +1869,8 @@ JsVarSerializerWriteRawBytes(
 CHAKRA_API
 JsVarSerializerWriteValue(
     _In_ JsVarSerializerHandle serializerHandle,
-    _In_ JsValueRef rootObject);
+    _In_ JsValueRef rootObject
+);
 
 /// <summary>
 ///     A method to pass on the current serialized buffer (this buffer was allocated using ReallocateBufferMemory) to host.
@@ -1806,7 +1884,8 @@ CHAKRA_API
 JsVarSerializerReleaseData(
     _In_ JsVarSerializerHandle serializerHandle,
     _Out_ byte** data,
-    _Out_ size_t *dataLength);
+    _Out_ size_t* dataLength
+);
 
 /// <summary>
 ///     Detach all array buffers which were passed using SetTransferableVars.
@@ -1828,8 +1907,9 @@ JsVarSerializerDetachArrayBuffer(_In_ JsVarSerializerHandle serializerHandle);
 CHAKRA_API
 JsVarSerializerSetTransferableVars(
     _In_ JsVarSerializerHandle serializerHandle,
-    _In_opt_ JsValueRef *transferableVars,
-    _In_ size_t transferableVarsCount);
+    _In_opt_ JsValueRef* transferableVars,
+    _In_ size_t transferableVarsCount
+);
 
 /// <summary>
 ///     Free current object (which was created upon JsVarSerializer) when the serialization is done. SerializerHandleBase object should not be used further after FreeSelf call.
@@ -1846,7 +1926,7 @@ JsVarSerializerFree(_In_ JsVarSerializerHandle serializerHandle);
 /// <returns>
 ///     A valid host object is returned upon success, an exception is thrown otherwise.
 /// </returns>
-typedef JsValueRef(*ReadHostObjectFunc)(void* state);
+typedef JsValueRef (*ReadHostObjectFunc)(void* state);
 
 /// <summary>
 ///     A callback to ask host to retrieve SharedArrayBuffer object from given ID.
@@ -1855,7 +1935,7 @@ typedef JsValueRef(*ReadHostObjectFunc)(void* state);
 /// <returns>
 ///     A valid SharedArrayBuffer is returned upon success, an exception is thrown otherwise.
 /// </returns>
-typedef JsValueRef(*GetSharedArrayBufferFromIdFunc)(void* state, uint32_t id);
+typedef JsValueRef (*GetSharedArrayBufferFromIdFunc)(void* state, uint32_t id);
 
 /// <summary>
 ///     Initiate Deserialization of the memory buffer to a Javascript object.
@@ -1871,12 +1951,13 @@ typedef JsValueRef(*GetSharedArrayBufferFromIdFunc)(void* state, uint32_t id);
 /// </returns>
 CHAKRA_API
 JsVarDeserializer(
-    _In_ void *data,
+    _In_ void* data,
     _In_ size_t size,
     _In_ ReadHostObjectFunc readHostObject,
     _In_ GetSharedArrayBufferFromIdFunc getSharedArrayBufferFromId,
     _In_opt_ void* callbackState,
-    _Out_ JsVarDeserializerHandle *deserializerHandle);
+    _Out_ JsVarDeserializerHandle* deserializerHandle
+);
 
 /// <summary>
 ///     A method to read bytes from the serialized buffer. Caller should not allocate the data buffer.
@@ -1887,7 +1968,11 @@ JsVarDeserializer(
 ///     A Boolean value true is returned upon success, false otherwise.
 /// </returns>
 CHAKRA_API
-JsVarDeserializerReadRawBytes(_In_ JsVarDeserializerHandle deserializerHandle, _In_ size_t length, _Out_ void **data);
+JsVarDeserializerReadRawBytes(
+    _In_ JsVarDeserializerHandle deserializerHandle,
+    _In_ size_t length,
+    _Out_ void** data
+);
 
 /// <summary>
 ///     A method to read bytes from the serialized buffer. Caller must allocate data buffer by length.
@@ -1898,7 +1983,11 @@ JsVarDeserializerReadRawBytes(_In_ JsVarDeserializerHandle deserializerHandle, _
 ///     A Boolean value true is returned upon success, false otherwise.
 /// </returns>
 CHAKRA_API
-JsVarDeserializerReadBytes(_In_ JsVarDeserializerHandle deserializerHandle, _In_ size_t length, _Out_ void **data);
+JsVarDeserializerReadBytes(
+    _In_ JsVarDeserializerHandle deserializerHandle,
+    _In_ size_t length,
+    _Out_ void** data
+);
 
 /// <summary>
 ///     Deserialized current buffer and pass the root object.
@@ -1907,7 +1996,10 @@ JsVarDeserializerReadBytes(_In_ JsVarDeserializerHandle deserializerHandle, _In_
 ///     A valid Javascript object is returned upon success, an exception is thrown otherwise.
 /// </returns>
 CHAKRA_API
-JsVarDeserializerReadValue(_In_ JsVarDeserializerHandle deserializerHandle, _Out_ JsValueRef* value);
+JsVarDeserializerReadValue(
+    _In_ JsVarDeserializerHandle deserializerHandle,
+    _Out_ JsValueRef* value
+);
 
 /// <summary>
 ///     Host provides all the objects which has transferable semantics (Such as ArrayBuffers).
@@ -1918,7 +2010,11 @@ JsVarDeserializerReadValue(_In_ JsVarDeserializerHandle deserializerHandle, _Out
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsVarDeserializerSetTransferableVars(_In_ JsVarDeserializerHandle deserializerHandle, _In_opt_ JsValueRef *transferableVars, _In_ size_t transferableVarsCount);
+JsVarDeserializerSetTransferableVars(
+    _In_ JsVarDeserializerHandle deserializerHandle,
+    _In_opt_ JsValueRef* transferableVars,
+    _In_ size_t transferableVarsCount
+);
 
 /// <summary>
 ///     Free current object (which was created upon JsVarSerializer) when the serialization is done. JsVarSerializerHandle object should not be used further after FreeSelf call.
@@ -1938,9 +2034,7 @@ JsVarDeserializerFree(_In_ JsVarDeserializerHandle deserializerHandle);
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsGetArrayBufferExtraInfo(
-    _In_ JsValueRef arrayBuffer,
-    _Out_ char *extraInfo);
+JsGetArrayBufferExtraInfo(_In_ JsValueRef arrayBuffer, _Out_ char* extraInfo);
 
 /// <summary>
 ///     Set Extra info (host data) to an ArrayBuffer object.
@@ -1951,9 +2045,7 @@ JsGetArrayBufferExtraInfo(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsSetArrayBufferExtraInfo(
-    _In_ JsValueRef arrayBuffer,
-    _In_ char extraInfo);
+JsSetArrayBufferExtraInfo(_In_ JsValueRef arrayBuffer, _In_ char extraInfo);
 
 /// <summary>
 ///     Neuter current ArrayBuffer
@@ -1963,10 +2055,9 @@ JsSetArrayBufferExtraInfo(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsDetachArrayBuffer(
-    _In_ JsValueRef arrayBuffer);
+JsDetachArrayBuffer(_In_ JsValueRef arrayBuffer);
 
-typedef void(__cdecl *ArrayBufferFreeFn)(void*);
+typedef void(__cdecl* ArrayBufferFreeFn)(void*);
 
 /// <summary>
 ///     Returns the function which free the underlying buffer of ArrayBuffer
@@ -1980,7 +2071,8 @@ typedef void(__cdecl *ArrayBufferFreeFn)(void*);
 CHAKRA_API
 JsGetArrayBufferFreeFunction(
     _In_ JsValueRef arrayBuffer,
-    _Out_ ArrayBufferFreeFn* freeFn);
+    _Out_ ArrayBufferFreeFn* freeFn
+);
 
 /// <summary>
 ///     Take ownership of current ArrayBuffer
@@ -1990,8 +2082,7 @@ JsGetArrayBufferFreeFunction(
 ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
 /// </returns>
 CHAKRA_API
-JsExternalizeArrayBuffer(
-    _In_ JsValueRef arrayBuffer);
+JsExternalizeArrayBuffer(_In_ JsValueRef arrayBuffer);
 
 /// <summary>
 ///     Get host embedded data from the current object
@@ -2017,10 +2108,9 @@ JsGetEmbedderData(_In_ JsValueRef instance, _Out_ JsValueRef* embedderData);
 CHAKRA_API
 JsSetEmbedderData(_In_ JsValueRef instance, _In_ JsValueRef embedderData);
 
-#ifdef _WIN32
-#include "ChakraCoreWindows.h"
-#endif // _WIN32
+        #ifdef _WIN32
+            #include "ChakraCoreWindows.h"
+        #endif // _WIN32
 
-
-#endif // _CHAKRACOREBUILD
+    #endif // _CHAKRACOREBUILD
 #endif // _CHAKRACORE_H_

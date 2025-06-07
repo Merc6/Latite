@@ -2,21 +2,27 @@
 #include "api/eventing/Event.h"
 #include "util/FNV32.h"
 
-class CharEvent : public Cancellable {
-public:
-	static const uint32_t hash = TOHASH(CharEvent);
+class CharEvent: public Cancellable {
+  public:
+    static const uint32_t hash = TOHASH(CharEvent);
 
-	// Special Chars:
-	// 0x1: Copy Request
-	// 0x2: Enter Request
-	// 0x3: Select All Request
-	[[nodiscard]] wchar_t getChar() { return ch; }
-	[[nodiscard]] bool isChar() { return isCharBool; }
+    // Special Chars:
+    // 0x1: Copy Request
+    // 0x2: Enter Request
+    // 0x3: Select All Request
+    [[nodiscard]]
+    wchar_t getChar() {
+        return ch;
+    }
 
-	CharEvent(wchar_t ch, bool isChar = true) : ch(ch), isCharBool(isChar) {
-	}
+    [[nodiscard]]
+    bool isChar() {
+        return isCharBool;
+    }
 
-protected:
-	wchar_t ch;
-	bool isCharBool;
+    CharEvent(wchar_t ch, bool isChar = true) : ch(ch), isCharBool(isChar) {}
+
+  protected:
+    wchar_t ch;
+    bool isCharBool;
 };

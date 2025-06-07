@@ -1,204 +1,259 @@
 ﻿#pragma once
+#include <optional>
 #include <string_view>
+
 #include "api/eventing/Listenable.h"
 #include "api/feature/setting/Setting.h"
-#include <optional>
-#include "misc/Timings.h"
-#include "misc/Notifications.h"
 #include "localization/LocalizeData.h"
+#include "misc/Notifications.h"
+#include "misc/Timings.h"
 
 namespace ui {
-	class TextBox;
+class TextBox;
 }
 
 namespace sdk {
-	class Font;
+class Font;
 }
 
-class Latite final : public Listener {
-public:
-	[[nodiscard]] static Latite& get() noexcept;
+class Latite final: public Listener {
+  public:
+    [[nodiscard]]
+    static Latite& get() noexcept;
 
-	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
-	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
-	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
-	[[nodiscard]] static class ClientMessageQueue& getClientMessageQueue() noexcept;
-	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
-	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
-	[[nodiscard]] static class Eventing& getEventing() noexcept;
-	[[nodiscard]] static class Renderer& getRenderer() noexcept;
-	[[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
-	[[nodiscard]] static class Assets& getAssets() noexcept;
-	[[nodiscard]] static class PluginManager& getPluginManager() noexcept;
-	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
-	[[nodiscard]] static class Notifications& getNotifications() noexcept;
+    [[nodiscard]]
+    static class ModuleManager& getModuleManager() noexcept;
+    [[nodiscard]]
+    static class CommandManager& getCommandManager() noexcept;
+    [[nodiscard]]
+    static class ConfigManager& getConfigManager() noexcept;
+    [[nodiscard]]
+    static class ClientMessageQueue& getClientMessageQueue() noexcept;
+    [[nodiscard]]
+    static class SettingGroup& getSettings() noexcept;
+    [[nodiscard]]
+    static class LatiteHooks& getHooks() noexcept;
+    [[nodiscard]]
+    static class Eventing& getEventing() noexcept;
+    [[nodiscard]]
+    static class Renderer& getRenderer() noexcept;
+    [[nodiscard]]
+    static class ScreenManager& getScreenManager() noexcept;
+    [[nodiscard]]
+    static class Assets& getAssets() noexcept;
+    [[nodiscard]]
+    static class PluginManager& getPluginManager() noexcept;
+    [[nodiscard]]
+    static class Keyboard& getKeyboard() noexcept;
+    [[nodiscard]]
+    static class Notifications& getNotifications() noexcept;
 
-	[[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
-	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
-	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
-	[[nodiscard]] int getSelectedLanguage() { return clientLanguage.getSelectedKey(); }
+    [[nodiscard]]
+    LocalizeData& getL10nData() noexcept {
+        return *l10nData;
+    }
 
-	void queueEject() noexcept;
-	void initialize(HINSTANCE hInst);
+    [[nodiscard]]
+    Timings& getTimings() noexcept {
+        return timings;
+    }
 
-	std::string getTextAsset(int resource);
-	void downloadChakraCore();
-	void initLanguageSetting();
-	void initSettings();
-	void detectLanguage();
+    [[nodiscard]]
+    std::string getCommandPrefix() {
+        return util::WStrToStr(std::get<TextValue>(commandPrefix).str);
+    }
 
-	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
-	void queueForClientThread(std::function<void()> callback);
-	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
+    [[nodiscard]]
+    int getSelectedLanguage() {
+        return clientLanguage.getSelectedKey();
+    }
 
-	Latite() = default;
-	~Latite() = default;
+    void queueEject() noexcept;
+    void initialize(HINSTANCE hInst);
 
-	static constexpr std::string_view version = "v2.5.1";
-	HINSTANCE dllInst = NULL;
-	std::string gameVersion;
+    std::string getTextAsset(int resource);
+    void downloadChakraCore();
+    void initLanguageSetting();
+    void initSettings();
+    void detectLanguage();
 
-	std::optional<float> getMenuBlur();
+    void queueForUIRender(
+        std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback
+    );
+    void queueForClientThread(std::function<void()> callback);
+    void
+    queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
 
-	void addTextBox(ui::TextBox* box) {
-		textBoxes.push_back(box);
-	}
+    Latite() = default;
+    ~Latite() = default;
 
-	void removeTextBox(ui::TextBox* box) {
-		for (auto it = textBoxes.begin(); it != textBoxes.end(); ++it) {
-			if (*it == box) {
-				textBoxes.erase(it);
-				break;
-			}
-		}
-	}
+    static constexpr std::string_view version = "v2.5.1";
+    HINSTANCE dllInst = NULL;
+    std::string gameVersion;
 
-	std::vector<std::string> getLatiteUsers();
+    std::optional<float> getMenuBlur();
 
-	[[nodiscard]] KeyValue getMenuKey() {
-		return std::get<KeyValue>(menuKey);
-	}
+    void addTextBox(ui::TextBox* box) {
+        textBoxes.push_back(box);
+    }
 
-	[[nodiscard]] ColorValue getAccentColor() {
-		return std::get<ColorValue>(accentColor);
-	}
+    void removeTextBox(ui::TextBox* box) {
+        for (auto it = textBoxes.begin(); it != textBoxes.end(); ++it) {
+            if (*it == box) {
+                textBoxes.erase(it);
+                break;
+            }
+        }
+    }
 
-	[[nodiscard]] bool shouldForceDX11() {
-		return std::get<BoolValue>(useDX11);
-	}
+    std::vector<std::string> getLatiteUsers();
 
-	[[nodiscard]] bool shouldForceDisableVSync() {
-		return std::get<BoolValue>(forceDisableVSync);
-	}
+    [[nodiscard]]
+    KeyValue getMenuKey() {
+        return std::get<KeyValue>(menuKey);
+    }
 
-	[[nodiscard]] bool shoulBlurHUD() {
-		return std::get<BoolValue>(hudBlur);
-	}
+    [[nodiscard]]
+    ColorValue getAccentColor() {
+        return std::get<ColorValue>(accentColor);
+    }
 
-	[[nodiscard]] struct ID2D1BitmapBrush1* getHUDBlurBrush() {
-		return hudBlurBrush.Get();
-	}
+    [[nodiscard]]
+    bool shouldForceDX11() {
+        return std::get<BoolValue>(useDX11);
+    }
 
-	[[nodiscard]] bool useMinecraftRenderer() {
-		return std::get<BoolValue>(minecraftRenderer);
-	}
+    [[nodiscard]]
+    bool shouldForceDisableVSync() {
+        return std::get<BoolValue>(forceDisableVSync);
+    }
 
-	[[nodiscard]] bool shouldRenderTextShadows() {
-		return std::get<BoolValue>(textShadow);
-	}
+    [[nodiscard]]
+    bool shoulBlurHUD() {
+        return std::get<BoolValue>(hudBlur);
+    }
 
-	[[nodiscard]] bool getDoSnapLines() {
-		return std::get<BoolValue>(snapLines);
-	}
+    [[nodiscard]]
+    struct ID2D1BitmapBrush1* getHUDBlurBrush() {
+        return hudBlurBrush.Get();
+    }
 
-	[[nodiscard]] bool getDetectLanguageSetting() {
-		return std::get<BoolValue>(detectLanguageSetting);
-	}
+    [[nodiscard]]
+    bool useMinecraftRenderer() {
+        return std::get<BoolValue>(minecraftRenderer);
+    }
 
-	[[nodiscard]] SDK::Font* getFont();
+    [[nodiscard]]
+    bool shouldRenderTextShadows() {
+        return std::get<BoolValue>(textShadow);
+    }
 
-	void fetchLatiteUsers();
-	std::wstring GetCurrentModuleFilePath(HMODULE hModule);
-	std::string fetchLatestGitHash();
-	std::string calcCurrentDLLHash();
+    [[nodiscard]]
+    bool getDoSnapLines() {
+        return std::get<BoolValue>(snapLines);
+    }
 
-	void writeServerIP();
+    [[nodiscard]]
+    bool getDetectLanguageSetting() {
+        return std::get<BoolValue>(detectLanguageSetting);
+    }
 
-	void initAsset(int resource, std::wstring const& filename);
+    [[nodiscard]]
+    SDK::Font* getFont();
 
-	void initL10n();
+    void fetchLatiteUsers();
+    std::wstring GetCurrentModuleFilePath(HMODULE hModule);
+    std::string fetchLatestGitHash();
+    std::string calcCurrentDLLHash();
 
-	void loadLanguageConfig(std::shared_ptr<Setting> languageSetting);
-	void loadConfig(class SettingGroup& resolvedGroup);
-	float getRGBHue() const { return rgbHue; }
+    void writeServerIP();
 
-	static bool isMainThread() { return std::this_thread::get_id() == gameThreadId; }
-private:
-	std::optional<LocalizeData> l10nData;
+    void initAsset(int resource, std::wstring const& filename);
 
-	bool downloadingAssets = false;
-	std::vector<std::string> latiteUsers;
-	std::vector<std::string> latiteUsersDirty;
+    void initL10n();
 
-	std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>> uiRenderQueue;
-	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
-	std::queue<std::function<void()>> clientThreadQueue;
+    void loadLanguageConfig(std::shared_ptr<Setting> languageSetting);
+    void loadConfig(class SettingGroup& resolvedGroup);
 
-	Timings timings{};
-	inline static std::optional<std::thread::id> gameThreadId;
-	inline static HWND minecraftWindow = 0;
+    float getRGBHue() const {
+        return rgbHue;
+    }
 
-	ValueType commandPrefix = TextValue(L".");
-	ValueType menuKey = KeyValue('M');
-	ValueType ejectKey = KeyValue(VK_END);
-	ValueType hudBlur = BoolValue(false);
-	ValueType hudBlurIntensity = FloatValue(10.f);
-	ValueType menuBlurEnabled = BoolValue(true);
-	// TODO: add disabled settings, for people who already only support dx11, gray it out
-	ValueType useDX11 = BoolValue(false);
-	ValueType forceDisableVSync = BoolValue(false);
-	ValueType menuBlur = FloatValue(20.f);
-	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
-	ValueType minimalViewBob = BoolValue(false);
-	ValueType minecraftRenderer = BoolValue(false);
-	ValueType textShadow = BoolValue(true);
-	ValueType broadcastUsage = BoolValue(true);
-	ValueType centerCursorMenus = BoolValue(false);
-	ValueType snapLines = BoolValue(true);
-	ValueType detectLanguageSetting = BoolValue(true);
-	ValueType secondaryFont = TextValue(L"Segoe UI");
-	ValueType rgbSpeed = FloatValue(1.f);
+    static bool isMainThread() {
+        return std::this_thread::get_id() == gameThreadId;
+    }
 
-	EnumData mcRendFont;
-	EnumData clientLanguage;
+  private:
+    std::optional<LocalizeData> l10nData;
 
-	std::vector<ui::TextBox*> textBoxes;
-	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
-	ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
-	ComPtr<struct ID2D1Effect> gaussianBlurEffect;
+    bool downloadingAssets = false;
+    std::vector<std::string> latiteUsers;
+    std::vector<std::string> latiteUsersDirty;
 
-	float rgbHue = 0.f;
+    std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>>
+        uiRenderQueue;
+    std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
+    std::queue<std::function<void()>> clientThreadQueue;
 
-	void threadsafeInit();
-	void patchKey();
+    Timings timings {};
+    inline static std::optional<std::thread::id> gameThreadId;
+    inline static HWND minecraftWindow = 0;
 
-	void updateModuleBlocking();
+    ValueType commandPrefix = TextValue(L".");
+    ValueType menuKey = KeyValue('M');
+    ValueType ejectKey = KeyValue(VK_END);
+    ValueType hudBlur = BoolValue(false);
+    ValueType hudBlurIntensity = FloatValue(10.f);
+    ValueType menuBlurEnabled = BoolValue(true);
+    // TODO: add disabled settings, for people who already only support dx11, gray it out
+    ValueType useDX11 = BoolValue(false);
+    ValueType forceDisableVSync = BoolValue(false);
+    ValueType menuBlur = FloatValue(20.f);
+    ValueType accentColor = ColorValue(
+        static_cast<float>(0x32) / 255.f,
+        static_cast<float>(0x39) / 255.f,
+        static_cast<float>(0x76) / 255.f
+    );
+    ValueType minimalViewBob = BoolValue(false);
+    ValueType minecraftRenderer = BoolValue(false);
+    ValueType textShadow = BoolValue(true);
+    ValueType broadcastUsage = BoolValue(true);
+    ValueType centerCursorMenus = BoolValue(false);
+    ValueType snapLines = BoolValue(true);
+    ValueType detectLanguageSetting = BoolValue(true);
+    ValueType secondaryFont = TextValue(L"Segoe UI");
+    ValueType rgbSpeed = FloatValue(1.f);
 
-	void onUpdate(class Event& ev);
-	void onKey(class Event& ev);
-	void onClick(class Event& ev);
-	void onChar(class Event& ev);
-	void onRendererInit(class Event& ev);
-	void onRendererCleanup(class Event& ev);
-	void onFocusLost(class Event& ev);
-	void onSuspended(class Event& ev);
-	void onBobView(class Event& ev);
-	void onLeaveGame(class Event& ev);
-	void onRenderLayer(class Event& ev);
-	void onRenderOverlay(class Event& ev);
-	void onPacketReceive(class Event& ev);
-	void onTick(class Event& ev);
+    EnumData mcRendFont;
+    EnumData clientLanguage;
 
-	bool shouldEject = false;
-	bool hasInit = false;
+    std::vector<ui::TextBox*> textBoxes;
+    ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
+    ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
+    ComPtr<struct ID2D1Effect> gaussianBlurEffect;
+
+    float rgbHue = 0.f;
+
+    void threadsafeInit();
+    void patchKey();
+
+    void updateModuleBlocking();
+
+    void onUpdate(class Event& ev);
+    void onKey(class Event& ev);
+    void onClick(class Event& ev);
+    void onChar(class Event& ev);
+    void onRendererInit(class Event& ev);
+    void onRendererCleanup(class Event& ev);
+    void onFocusLost(class Event& ev);
+    void onSuspended(class Event& ev);
+    void onBobView(class Event& ev);
+    void onLeaveGame(class Event& ev);
+    void onRenderLayer(class Event& ev);
+    void onRenderOverlay(class Event& ev);
+    void onPacketReceive(class Event& ev);
+    void onTick(class Event& ev);
+
+    bool shouldEject = false;
+    bool hasInit = false;
 };

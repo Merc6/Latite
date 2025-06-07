@@ -2,7 +2,7 @@
 
 #include "../../Module.h"
 
-class Waypoints : public Module {
-public:
-	Waypoints();
+class Waypoints: public Module {
+  public:
+    Waypoints();
 };

@@ -2,15 +2,17 @@
 #include "api/eventing/Event.h"
 #include "util/FNV32.h"
 
-class HideHandEvent : public Cancellable {
-public:
-	static const uint32_t hash = TOHASH(HideHandEvent);
+class HideHandEvent: public Cancellable {
+  public:
+    static const uint32_t hash = TOHASH(HideHandEvent);
 
-	[[nodiscard]] bool& getValue() { return *this->value; }
+    [[nodiscard]]
+    bool& getValue() {
+        return *this->value;
+    }
 
-	HideHandEvent(bool& value) : value(&value) {
-	}
+    HideHandEvent(bool& value) : value(&value) {}
 
-protected:
-	bool* value;
+  protected:
+    bool* value;
 };

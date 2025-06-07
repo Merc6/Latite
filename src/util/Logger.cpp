@@ -1,9 +1,11 @@
-#include "pch.h"
 #include "Logger.h"
-#include "util/Util.h"
+
 #include <ctime>
+
 #include "client/Latite.h"
 #include "client/misc/ClientMessageQueue.h"
+#include "pch.h"
+#include "util/Util.h"
 
 void Logger::Setup() {
     auto path = util::GetLatitePath();
@@ -12,7 +14,7 @@ void Logger::Setup() {
 }
 
 void Logger::LogInternal(Level level, std::string str) {
-    std::time_t t = std::time(0);   // get time now
+    std::time_t t = std::time(0); // get time now
     std::tm now;
     std::ostringstream oss;
     localtime_s(&now, &t);
@@ -20,26 +22,30 @@ void Logger::LogInternal(Level level, std::string str) {
     auto tmh = now.tm_hour;
     auto tmm = now.tm_min;
     auto tms = now.tm_sec;
-    std::string hr = (tmh > 9 ? std::string("") : std::string("0")) + std::to_string(tmh);
-    std::string mn = (tmm > 9 ? std::string("") : std::string("0")) + std::to_string(tmm);
-    std::string sn = (tms > 9 ? std::string("") : std::string("0")) + std::to_string(tms);
+    std::string hr =
+        (tmh > 9 ? std::string("") : std::string("0")) + std::to_string(tmh);
+    std::string mn =
+        (tmm > 9 ? std::string("") : std::string("0")) + std::to_string(tmm);
+    std::string sn =
+        (tms > 9 ? std::string("") : std::string("0")) + std::to_string(tms);
 
     std::stringstream time;
-    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << "-" << (now.tm_year + 1900) << ", " << hr << ":" << mn << ":" << sn << "]";
+    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << "-"
+         << (now.tm_year + 1900) << ", " << hr << ":" << mn << ":" << sn << "]";
 
     oss << std::put_time(&now, "%Y-%m-%d");
 
     std::string prefix = "";
     switch (level) {
-    case Level::Info:
-        prefix = "INFO";
-        break;
-    case Level::Warn:
-        prefix = "WARN";
-        break;
-    case Level::Fatal:
-        prefix = "FATAL";
-        break;
+        case Level::Info:
+            prefix = "INFO";
+            break;
+        case Level::Warn:
+            prefix = "WARN";
+            break;
+        case Level::Fatal:
+            prefix = "FATAL";
+            break;
     }
 
     std::string pref = time.str() + " [" + prefix + "] ";
@@ -68,6 +74,8 @@ void Logger::LogInternal(Level level, std::string str) {
     OutputDebugStringA(mstr.c_str());
 
 #if LATITE_DEBUG
-    Latite::get().getClientMessageQueue().push(util::Format("&7" + pref + "&r" + str));
+    Latite::get().getClientMessageQueue().push(
+        util::Format("&7" + pref + "&r" + str)
+    );
 #endif
 }

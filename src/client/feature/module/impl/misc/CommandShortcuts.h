@@ -1,10 +1,10 @@
 #pragma once
 #include "../../Module.h"
 
-class CommandShortcuts : public Module {
-public:
-	CommandShortcuts();
-	virtual ~CommandShortcuts() {};
+class CommandShortcuts: public Module {
+  public:
+    CommandShortcuts();
+    virtual ~CommandShortcuts() {};
 
-	void onPacket(Event& evG);
+    void onPacket(Event& evG);
 };

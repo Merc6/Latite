@@ -1,53 +1,56 @@
-#include "pch.h"
 #include "DXHooks.h"
+
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
+#include "pch.h"
 #include "sdk/common/client/game/Options.h"
 
 namespace {
-    typedef HRESULT(WINAPI* CreateSwapChainForCoreWindow_t)(
-        IDXGIFactory2*,
-        IUnknown*,
-        IUnknown*,
-        const DXGI_SWAP_CHAIN_DESC1*,
-        IDXGIOutput*,
-        IDXGISwapChain1**);
+typedef HRESULT(WINAPI* CreateSwapChainForCoreWindow_t)(
+    IDXGIFactory2*,
+    IUnknown*,
+    IUnknown*,
+    const DXGI_SWAP_CHAIN_DESC1*,
+    IDXGIOutput*,
+    IDXGISwapChain1**
+);
 
-    bool tearingSupported = false;
-    bool isForceDisableVSync = false;
-    std::shared_ptr<Hook> PresentHook;
-    std::shared_ptr<Hook> ResizeBuffersHook;
-    std::shared_ptr<Hook> ExecuteCommandListsHook;
+bool tearingSupported = false;
+bool isForceDisableVSync = false;
+std::shared_ptr<Hook> PresentHook;
+std::shared_ptr<Hook> ResizeBuffersHook;
+std::shared_ptr<Hook> ExecuteCommandListsHook;
 
-    // TODO: temporary, remove this
-    bool isGfxVsyncDisabled() {
-        wchar_t userProfile[MAX_PATH];
-        DWORD pathLen = GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH);
-        if (pathLen == 0 || pathLen >= MAX_PATH) {
-            return true;
-        }
-
-        std::wstring optionsPath(userProfile);
-        optionsPath +=
-            L"\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftpe\\options.txt";
-
-        std::ifstream file(optionsPath.c_str());
-        if (!file.is_open()) {
-            return true;
-        }
-
-        std::string line;
-        while (std::getline(file, line)) {
-            std::erase(line, '\r');
-            if (line.find("gfx_vsync:") == 0) {
-                return line != "gfx_vsync:0";
-            }
-        }
-
-        // default to enabled
+// TODO: temporary, remove this
+bool isGfxVsyncDisabled() {
+    wchar_t userProfile[MAX_PATH];
+    DWORD pathLen =
+        GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH);
+    if (pathLen == 0 || pathLen >= MAX_PATH) {
         return true;
     }
+
+    std::wstring optionsPath(userProfile);
+    optionsPath +=
+        L"\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftpe\\options.txt";
+
+    std::ifstream file(optionsPath.c_str());
+    if (!file.is_open()) {
+        return true;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::erase(line, '\r');
+        if (line.find("gfx_vsync:") == 0) {
+            return line != "gfx_vsync:0";
+        }
+    }
+
+    // default to enabled
+    return true;
 }
+} // namespace
 
 void DXHooks::CheckForceDisableVSync() {
     if (Latite::get().shouldForceDisableVSync()) {
@@ -62,9 +65,10 @@ void DXHooks::CheckTearingSupport() {
     if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory5)))) {
         BOOL allowTearing = FALSE;
         if (SUCCEEDED(factory5->CheckFeatureSupport(
-            DXGI_FEATURE_PRESENT_ALLOW_TEARING,
-            &allowTearing,
-            sizeof(allowTearing)))) {
+                DXGI_FEATURE_PRESENT_ALLOW_TEARING,
+                &allowTearing,
+                sizeof(allowTearing)
+            ))) {
             if (allowTearing && !isGfxVsyncDisabled()) {
                 tearingSupported = true;
             }
@@ -80,18 +84,28 @@ HRESULT WINAPI DXHooks::CreateSwapChainForCoreWindowHook(
     IUnknown* window,
     const DXGI_SWAP_CHAIN_DESC1* desc,
     IDXGIOutput* output,
-    IDXGISwapChain1** swapChain) {
-
+    IDXGISwapChain1** swapChain
+) {
     DXGI_SWAP_CHAIN_DESC1 modifiedDesc = *desc;
     if (tearingSupported && isForceDisableVSync) {
         modifiedDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
-    return origCreateSwapChain(factory, device, window, &modifiedDesc,
-        output, swapChain);
+    return origCreateSwapChain(
+        factory,
+        device,
+        window,
+        &modifiedDesc,
+        output,
+        swapChain
+    );
 }
 
-HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
+HRESULT __stdcall DXHooks::SwapChain_Present(
+    IDXGISwapChain* chain,
+    UINT SyncInterval,
+    UINT Flags
+) {
     if (Latite::getRenderer().hasInitialized()) {
         auto lock = Latite::getRenderer().lock();
         Latite::getRenderer().render();
@@ -117,7 +131,11 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
         presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
     }
 
-    return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, syncInterval, presentFlags);
+    return PresentHook->oFunc<decltype(&SwapChain_Present)>()(
+        chain,
+        syncInterval,
+        presentFlags
+    );
 }
 
 HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
@@ -126,24 +144,31 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
     UINT Width,
     UINT Height,
     DXGI_FORMAT NewFormat,
-    UINT SwapChainFlags) {
-
+    UINT SwapChainFlags
+) {
     Latite::getRenderer().reinit();
     UINT newFlags = SwapChainFlags;
     if (tearingSupported && isForceDisableVSync) {
         newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
-    return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
-        chain, BufferCount, Width, Height, NewFormat, newFlags);
+    return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers
+    )>()(chain, BufferCount, Width, Height, NewFormat, newFlags);
 }
 
-HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
-    ID3D12CommandList* const* ppCommandLists) {
+HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(
+    ID3D12CommandQueue* queue,
+    UINT NumCommandLists,
+    ID3D12CommandList* const* ppCommandLists
+) {
     auto lock = Latite::getRenderer().lock();
     Latite::getRenderer().setCommandQueue(queue);
-    return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(
-        queue, NumCommandLists, ppCommandLists);
+    return ExecuteCommandListsHook
+        ->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(
+            queue,
+            NumCommandLists,
+            ppCommandLists
+        );
 }
 
 DXHooks::DXHooks() : HookGroup("DirectX") {
@@ -169,7 +194,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-    WNDCLASSEX wnd{ 0 };
+    WNDCLASSEX wnd {0};
     ZeroMemory(&wnd, sizeof(WNDCLASSEX));
 
     wnd.cbSize = sizeof(WNDCLASSEX);
@@ -181,35 +206,62 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 
     RegisterClassEx(&wnd);
 
-    HWND hWnd = CreateWindowEx(0, L"dummywnd", L"hi", WS_MINIMIZEBOX,
-        0, 0, 100, 100, nullptr, nullptr, Latite::get().dllInst, nullptr);
+    HWND hWnd = CreateWindowEx(
+        0,
+        L"dummywnd",
+        L"hi",
+        WS_MINIMIZEBOX,
+        0,
+        0,
+        100,
+        100,
+        nullptr,
+        nullptr,
+        Latite::get().dllInst,
+        nullptr
+    );
 
     swapChainDesc.OutputWindow = hWnd;
     swapChainDesc.SampleDesc.Count = 1;
     swapChainDesc.Windowed = TRUE;
 
-    D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
+    D3D_FEATURE_LEVEL lvl[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1};
 
     D3D_FEATURE_LEVEL featureLevel;
-    auto hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, lvl, 2, D3D11_SDK_VERSION,
-        &swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(),
-        &featureLevel, dctx.GetAddressOf());
+    auto hr = D3D11CreateDeviceAndSwapChain(
+        nullptr,
+        D3D_DRIVER_TYPE_HARDWARE,
+        nullptr,
+        0,
+        lvl,
+        2,
+        D3D11_SDK_VERSION,
+        &swapChainDesc,
+        swapChain.GetAddressOf(),
+        device.GetAddressOf(),
+        &featureLevel,
+        dctx.GetAddressOf()
+    );
 
     uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
     uintptr_t* cqueueVftable = nullptr;
 
     {
-
         //DX12 only
-        // 
+        //
         // dummy device
-        if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device12)))) {
-
+        if (SUCCEEDED(D3D12CreateDevice(
+                adapter.Get(),
+                D3D_FEATURE_LEVEL_11_0,
+                IID_PPV_ARGS(&device12)
+            ))) {
             D3D12_COMMAND_QUEUE_DESC queueDesc = {};
             queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
             queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-            ThrowIfFailed(device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cqueue)));
+            ThrowIfFailed(
+                device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cqueue))
+            );
             cqueueVftable = *reinterpret_cast<uintptr_t**>(cqueue.Get());
         }
     }
@@ -220,17 +272,31 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     ComPtr<IDXGIFactory2> factory2;
     if (SUCCEEDED(factory.As(&factory2))) {
         void** vtable = *(void***)factory2.Get();
-        MH_CreateHook(vtable[16], DXHooks::CreateSwapChainForCoreWindowHook,
-            (void**)&origCreateSwapChain);
+        MH_CreateHook(
+            vtable[16],
+            DXHooks::CreateSwapChainForCoreWindowHook,
+            (void**)&origCreateSwapChain
+        );
         MH_EnableHook(vtable[16]);
     }
 
-    PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
-    ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
+    PresentHook =
+        addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
+    ResizeBuffersHook = addHook(
+        vftable[13],
+        SwapChain_ResizeBuffers,
+        "IDXGISwapChain::ResizeBuffers"
+    );
 
     // Needed for D3D11On12 for DX12
-    if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
+    if (cqueueVftable)
+        ExecuteCommandListsHook = addHook(
+            cqueueVftable[10],
+            CommandQueue_ExecuteCommandLists,
+            "ID3D12CommandQueue::executeCommandLists"
+        );
     PresentHook->enable();
     ResizeBuffersHook->enable();
-    if (cqueueVftable) ExecuteCommandListsHook->enable();
+    if (cqueueVftable)
+        ExecuteCommandListsHook->enable();
 }

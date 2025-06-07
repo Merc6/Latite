@@ -1,5 +1,5 @@
-#include "pch.h"
 #include "ScriptingObject.h"
 
-ScriptingObject::~ScriptingObject() {
-}
+#include "pch.h"
+
+ScriptingObject::~ScriptingObject() {}

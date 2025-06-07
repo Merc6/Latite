@@ -3,15 +3,17 @@
 #include "sdk/common/world/level/Level.h"
 #include "util/FNV32.h"
 
-class TickEvent : public Event {
-public:
-	static const uint32_t hash = TOHASH(TickEvent);
-	
-	[[nodiscard]] SDK::Level* getLevel() { return level; }
+class TickEvent: public Event {
+  public:
+    static const uint32_t hash = TOHASH(TickEvent);
 
-	TickEvent(SDK::Level* lvl) : level(lvl) {
-	}
+    [[nodiscard]]
+    SDK::Level* getLevel() {
+        return level;
+    }
 
-protected:
-	SDK::Level* level;
+    TickEvent(SDK::Level* lvl) : level(lvl) {}
+
+  protected:
+    SDK::Level* level;
 };
