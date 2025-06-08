@@ -6,7 +6,7 @@ project(Latite VERSION 2.1.0
 
 add_library(Latite SHARED)
 
-include(cmake/Sources.cmake)
+include(cmake/Find*.cmake)
 
 add_library(Latite.api STATIC)
 add_library(Latite.client STATIC)
