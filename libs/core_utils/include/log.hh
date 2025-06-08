@@ -1,8 +1,13 @@
 #pragma once
 
+#include <filesystem>
 #include <string_view>
 
+#include "paths.hh"
+
 namespace latite::core_utils::log {
+
+std::filesystem::path const& get_logs_dir();
 
 enum class Level {
     Error,
