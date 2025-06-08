@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <filesystem>
+#include <stdexcept>
 
 namespace latite::core_utils::paths {
 
