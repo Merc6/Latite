@@ -8,5 +8,6 @@ add_subdirectory(libs/api)
 add_subdirectory(libs/client)
 add_subdirectory(libs/sdk)
 add_subdirectory(libs/util)
+add_subdirectory(libs/core_utils)
 
 add_subdirectory(src)
