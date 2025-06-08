@@ -1,4 +1,6 @@
 #pragma once
+
+#include <cstdlib>
 #include <filesystem>
 
 namespace latite::core_utils::paths {
