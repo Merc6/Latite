@@ -7,7 +7,7 @@
 namespace latite::core_utils::paths {
 
 std::filesystem::path const& get_root_dir() {
-    static auto ROOT_DIR = [] {
+    static auto const ROOT_DIR = [] {
         char const* ac_dir = getenv("LOCALAPPDATA");
 
         if (ac_dir == nullptr) {
@@ -23,12 +23,12 @@ std::filesystem::path const& get_root_dir() {
 }
 
 std::filesystem::path const& get_roaming_dir() {
-    static auto ROAMING_DIR = get_root_dir() / "RoamingState";
+    static auto const ROAMING_DIR = get_root_dir() / "RoamingState";
     return ROAMING_DIR;
 }
 
 std::filesystem::path const& get_client_dir() {
-    static auto CLIENT_DIR = get_roaming_dir() / "LatiteV3";
+    static auto const CLIENT_DIR = get_roaming_dir() / "LatiteV3";
     return CLIENT_DIR;
 }
 
