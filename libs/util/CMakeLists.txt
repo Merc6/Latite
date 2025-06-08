@@ -14,7 +14,7 @@ add_library(Latite.util STATIC
 	include/FNV32.h
 	include/Json.h
 	include/LMath.h
-	include/Loggers.h
+	include/Logger.h
 	include/Util.h
 	include/XorString.h
 )

@@ -34,7 +34,7 @@ add_library(Latite.sdk STATIC
 	include/signature/storage_1_18_12.h
 	include/signature/storage_1_16_40.h
 	include/misc/ClickMap.h
-	include/deps/core_graphics/ImageBugger.h
+	include/deps/core_graphics/ImageBuffer.h
 	include/deps/core/StringUtils.h
 	include/deps/application/AppPlatform.h
 	include/common/world/Attribute.h
