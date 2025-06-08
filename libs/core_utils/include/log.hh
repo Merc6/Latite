@@ -1,6 +1,9 @@
 #pragma once
 
+#include <chrono>
 #include <filesystem>
+#include <fstream>
+#include <stdexcept>
 #include <string_view>
 
 #include "paths.hh"
@@ -8,6 +11,7 @@
 namespace latite::core_utils::log {
 
 std::filesystem::path const& get_logs_dir();
+std::filesystem::path const& get_session_file();
 
 enum class Level {
     Error,
@@ -16,20 +20,22 @@ enum class Level {
     Debug,
 };
 
+std::string_view to_str(Level level);
+
 class Logger {
   public:
     Logger(Logger const&) = delete;
     Logger& operator=(Logger const&) = delete;
 
-    Logger const& get_logger() {
-        static auto const GLOBAL_LOGGER = Logger();
-        return GLOBAL_LOGGER;
-    };
+    static Logger& get_logger();
 
-    void log(Level level, std::string_view msg);
+    void log(Level level, std::string_view msg, std::string_view file_context);
 
   private:
-    Logger() {};
+    std::ofstream session_stream;
+
+    Logger();
+    ~Logger();
 };
 
 } // namespace latite::core_utils::log
